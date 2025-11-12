@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.*.swn
+.*.swo
+.*.swp
+.vscode/
+.env*
+data/*.json
