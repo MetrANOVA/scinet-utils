@@ -18,6 +18,7 @@ python booth_metadata.py --url https://scinet.supercomputing.org/nautobot --api-
 
 ### Quickstart (with docker)
 ```
+cd booth-metadata
 cp env.example .env
 # Add your API token to .env
 docker compose up
