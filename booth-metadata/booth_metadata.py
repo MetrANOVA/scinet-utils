@@ -1,4 +1,5 @@
 import json
+import csv
 import requests
 import logging
 import argparse
@@ -26,6 +27,12 @@ class BoothMetadataCLI:
         return results
 
     def fetch_metadata(self):
+        # import csv of coordinates and create dict
+        coords_dict = {}
+        with open('booth-metadata/sc25-coords.csv') as csvfile: 
+            coords = csv.reader(csvfile)
+            for row in coords:
+                coords_dict[row[0]] = {'x': row[1], 'y': row[2]}
         #first fetch the list of prefixes where tenant group is Exhibitor
         prefixes = self._fetch_url_with_pagination(f"{self.api_url}/api/ipam/prefixes/?tenant_group=Exhibitor")
         #then fetch the list of tenants where tenant group is Exhibitor
@@ -37,14 +44,17 @@ class BoothMetadataCLI:
         # build a map of location tenant ids to location name
         location_map = {location["tenant"]["id"]: location["name"] for location in locations if location.get("tenant", {}).get("id", None) is not None}
         # build temp dict to join prefixes
-        temp_dict = defaultdict(lambda: {"addresses": [], "org_name": None, "booth_name": None})
+        temp_dict = defaultdict(lambda: {"addresses": [], "org_name": None, "resource_name": None, "latitude": None, "longitude": None})
         for prefix in prefixes:
             tenant_id = prefix.get("tenant", {}).get("id", None)
             if tenant_id is None or prefix.get("prefix", None) is None:
                 continue
             temp_dict[tenant_id]["addresses"].append(prefix["prefix"])
             temp_dict[tenant_id]["org_name"] = tenant_map.get(tenant_id, None)
-            temp_dict[tenant_id]["booth_name"] = location_map.get(tenant_id, None)
+            temp_dict[tenant_id]["resource_name"] = location_map.get(tenant_id, None)
+            booth_num = temp_dict[tenant_id]["resource_name"].split(" ")[1]
+            temp_dict[tenant_id]["latitude"] = coords_dict[booth_num]['x']
+            temp_dict[tenant_id]["longitude"] = coords_dict[booth_num]['y']
 
         return list(temp_dict.values())
 
@@ -71,7 +81,6 @@ if __name__ == "__main__":
     
     # Initialize CLI
     cli = BoothMetadataCLI(api_url, api_token)
-    
     # Fetch metadata from nautobot and return json
     metadata_json = None
     try:
