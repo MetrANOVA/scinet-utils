@@ -11,7 +11,7 @@ cd booth-metadata
 python -m venv ./venv
 . ./venv/bin/activate
 pip install -r requirements.txt
-python booth_metadata.py --url https://scinet.supercomputing.org/nautobot --api-token YOUR_API_TOKEN_HERE
+python booth_metadata.py --url https://scinet.supercomputing.org/nautobot --coords-file data/sc25-coords.csv --api-token YOUR_API_TOKEN_HERE
 # prints result to screen
 # add --output-file to output to file
 ```

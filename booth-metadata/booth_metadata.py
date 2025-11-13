@@ -8,9 +8,10 @@ import sys
 from collections import defaultdict
 
 class BoothMetadataCLI:
-    def __init__(self, api_url, api_token):
+    def __init__(self, api_url, api_token, coords_file):
         self.api_url = api_url
         self.api_token = api_token
+        self.coords_file = coords_file
         self.logger = logging.getLogger(__name__)
         self.headers = {
             "Authorization": f"Token {self.api_token}",
@@ -29,7 +30,7 @@ class BoothMetadataCLI:
     def fetch_metadata(self):
         # import csv of coordinates and create dict
         coords_dict = {}
-        with open('booth-metadata/sc25-coords.csv') as csvfile: 
+        with open(self.coords_file) as csvfile: 
             coords = csv.reader(csvfile)
             for row in coords:
                 coords_dict[row[0]] = {'x': row[1], 'y': row[2]}
@@ -62,12 +63,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch booth metadata from Nautobot API")
     parser.add_argument("--url", help="Nautobot API URL")
     parser.add_argument("--api-token", help="Nautobot API token")
+    parser.add_argument("--coords-file", help="Coordinates CSV file path")
     parser.add_argument("--output-file", help="Output file path")
     args = parser.parse_args()
     
     # Get values from args or environment variables
     api_url = args.url or os.environ.get("URL")
     api_token = args.api_token or os.environ.get("API_TOKEN")
+    coords_file = args.coords_file or os.environ.get("COORDS_FILE")
     output_file = args.output_file or os.environ.get("OUTPUT_FILE")
 
     # Validate required parameters
@@ -78,9 +81,13 @@ if __name__ == "__main__":
     if not api_token:
         print("Error: --api-token is required (or set API_TOKEN environment variable)", file=sys.stderr)
         sys.exit(1)
+
+    if not coords_file:
+        print("Error: --coords-file is required (or set COORDS_FILE environment variable)", file=sys.stderr)
+        sys.exit(1)
     
     # Initialize CLI
-    cli = BoothMetadataCLI(api_url, api_token)
+    cli = BoothMetadataCLI(api_url, api_token, coords_file)
     # Fetch metadata from nautobot and return json
     metadata_json = None
     try:
