@@ -17,10 +17,12 @@ class BoothMetadataCLI:
             "Authorization": f"Token {self.api_token}",
             "Content-Type": "application/json"
         }
-    def _fetch_url_with_pagination(self, url):
+    def _fetch_url_with_pagination(self, url, headers=None):
+        if headers is None:
+            headers = self.headers
         results = []
         while url:
-            response = requests.get(url, headers=self.headers)
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
             results.extend(data.get("results", []))
@@ -57,12 +59,64 @@ class BoothMetadataCLI:
             temp_dict[tenant_id]["latitude"] = coords_dict[booth_num]['x']
             temp_dict[tenant_id]["longitude"] = coords_dict[booth_num]['y']
 
+        # now load the intranet info if we have it
+        self.fetch_intranet_metadata(temp_dict, coords_dict)
+
         return list(temp_dict.values())
+    
+    def fetch_intranet_metadata(self, temp_dict, coords_dict):
+        if not self.intranet_api_token or not self.intranet_url:
+            return
+        intranet_headers = {
+            "Authorization": f"Token {self.intranet_api_token}",
+            "Content-Type": "application/json"
+        }
+        # Booths: https://scinet.supercomputing.org/intranet_api/v1/booth/
+        # Organization: https://scinet.supercomputing.org/intranet_api/v1/exhibitor_organization/
+        # Network: https://scinet.supercomputing.org/intranet_api/v1/network/
+        # Networked Connection: https://scinet.supercomputing.org/intranet_api/v1/networked_connection/
+        booths = self._fetch_url_with_pagination(f"{self.intranet_url}/booth/", headers=intranet_headers)
+        #Build map of booth id to booth object
+        booth_map = {booth["id"]: booth for booth in booths}
+        # Now fetch the list of organizations
+        organizations = self._fetch_url_with_pagination(f"{self.intranet_url}/exhibitor_organization/", headers=intranet_headers)
+        org_map = {org["id"]: org.get("name", None) for org in organizations}
+        # get list of networks
+        networks = self._fetch_url_with_pagination(f"{self.intranet_url}/network/", headers=intranet_headers)
+        network_map = {network["id"]: network for network in networks}
+        #no get list of connections and we'll add stuff to temp_dict
+        connections = self._fetch_url_with_pagination(f"{self.intranet_url}/networked_connection/", headers=intranet_headers)
+        for connection in connections:
+            booth_id = connection.get("booth", None)
+            if booth_id is None:
+                continue
+            network = network_map.get(connection.get("network", None), {})
+            if not network or not (network.get("net", None) or network.get("v6net", None)):
+                continue
+            booth_name = booth_map.get(booth_id, {}).get("name", None)
+            if booth_name is None:
+                continue
+            org_name = org_map.get(booth_map.get(booth_id, {}).get("organization", None), None)
+            if org_name is None:
+                org_name = "unknown"
+            booth_key = f"booth_{booth_id}"
+            if network.get("net", None):
+                temp_dict[booth_key]["addresses"].append(network["net"])
+            if network.get("v6net", None):
+                temp_dict[booth_key]["addresses"].append(network["v6net"])
+            temp_dict[booth_key]["org_name"] = org_name
+            temp_dict[booth_key]["resource_name"] = booth_name
+            booth_num = temp_dict[booth_key]["resource_name"].split(" ")[1]
+            if booth_num in coords_dict:
+                temp_dict[booth_key]["latitude"] = coords_dict[booth_num]['x']
+                temp_dict[booth_key]["longitude"] = coords_dict[booth_num]['y']
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch booth metadata from Nautobot API")
     parser.add_argument("--url", help="Nautobot API URL")
     parser.add_argument("--api-token", help="Nautobot API token")
+    parser.add_argument("--intranet-api-token", help="Intranet API token")
+    parser.add_argument("--intranet-url", help="Intranet API URL")
     parser.add_argument("--coords-file", help="Coordinates CSV file path")
     parser.add_argument("--output-file", help="Output file path")
     args = parser.parse_args()
@@ -88,6 +142,13 @@ if __name__ == "__main__":
     
     # Initialize CLI
     cli = BoothMetadataCLI(api_url, api_token, coords_file)
+    # Lookup Intranet info if we have it
+    if args.intranet_api_token and args.intranet_url:
+        cli.intranet_api_token = args.intranet_api_token
+        cli.intranet_url = args.intranet_url
+    elif os.environ.get("INTRANET_API_TOKEN") and os.environ.get("INTRANET_URL"):
+        cli.intranet_api_token = os.environ.get("INTRANET_API_TOKEN")
+        cli.intranet_url = os.environ.get("INTRANET_URL")
     # Fetch metadata from nautobot and return json
     metadata_json = None
     try:
