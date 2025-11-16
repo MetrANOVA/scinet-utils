@@ -5,6 +5,7 @@ import logging
 import argparse
 import os
 import sys
+import traceback
 from collections import defaultdict
 
 class BoothMetadataCLI:
@@ -17,6 +18,9 @@ class BoothMetadataCLI:
             "Authorization": f"Token {self.api_token}",
             "Content-Type": "application/json"
         }
+        self.intranet_api_token = None
+        self.intranet_url = None
+
     def _fetch_url_with_pagination(self, url, headers=None):
         if headers is None:
             headers = self.headers
@@ -56,8 +60,8 @@ class BoothMetadataCLI:
             temp_dict[tenant_id]["org_name"] = tenant_map.get(tenant_id, None)
             temp_dict[tenant_id]["resource_name"] = location_map.get(tenant_id, None)
             booth_num = temp_dict[tenant_id]["resource_name"].split(" ")[1]
-            temp_dict[tenant_id]["latitude"] = coords_dict[booth_num]['x']
-            temp_dict[tenant_id]["longitude"] = coords_dict[booth_num]['y']
+            temp_dict[tenant_id]["latitude"] = coords_dict.get(booth_num, {}).get('x', None)
+            temp_dict[tenant_id]["longitude"] = coords_dict.get(booth_num, {}).get('y', None)
 
         # now load the intranet info if we have it
         self.fetch_intranet_metadata(temp_dict, coords_dict)
@@ -155,6 +159,8 @@ if __name__ == "__main__":
         metadata_json = cli.fetch_metadata()
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
+        #print stack trace
+        traceback.print_exc()
         sys.exit(1) 
     if metadata_json is None:
         print("Error: Failed to fetch metadata", file=sys.stderr)
