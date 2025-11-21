@@ -1,0 +1,801 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_SCINET-CLICKHOUSE",
+      "label": "scinet-clickhouse",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-clickhouse-datasource",
+      "pluginName": "ClickHouse"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "esnet-networkmap-panel",
+      "name": "Network Map Panel",
+      "version": "3.1.0"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.2.1"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.11.2"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#2d2f37",
+                "value": 0
+              },
+              {
+                "color": "dark-purple",
+                "value": 1000
+              },
+              {
+                "color": "semi-dark-purple",
+                "value": 1000000
+              },
+              {
+                "color": "light-purple",
+                "value": 1000000000
+              },
+              {
+                "color": "super-light-purple",
+                "value": 100000000000
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 21,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "background": "#EDEDED",
+        "configurationUrl": "https://35.184.65.172/public/scinet/booth_map.json",
+        "customEdgeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>\n      ${forward.from} → ${forward.to}\n      <br />\n      Rate: ${forward.dataPoint}\n    </strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <span>\n      ${reverse.from} → ${reverse.to}\n      <br />\n      Rate: ${reverse.dataPoint}\n    </span>\n  </div>\n",
+        "customNodeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>${name}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>In Volume: ${inValue}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>Out Volume: ${outValue}</strong>\n  </div>\n",
+        "enableCustomEdgeTooltip": false,
+        "enableCustomNodeTooltip": false,
+        "enableEdgeAnimation": true,
+        "enableEditing": true,
+        "enableNodeAnimation": true,
+        "enableScrolling": true,
+        "initialViewStrategy": "static",
+        "layerLimit": 2,
+        "layers": [
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "dstField": "Booth",
+            "edgeWidth": 3,
+            "endpointId": "name",
+            "inboundValueField": "Out_Volume",
+            "legend": true,
+            "mapjson": "{\"edges\":[],\"nodes\":[]}",
+            "name": "Layer 1",
+            "nodeNameMatchField": "Booth",
+            "nodeThresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "#2d2f37",
+                  "value": 0
+                },
+                {
+                  "color": "semi-dark-purple",
+                  "value": 1000
+                },
+                {
+                  "color": "purple",
+                  "value": 1000000
+                },
+                {
+                  "color": "light-purple",
+                  "value": 1000000000
+                },
+                {
+                  "color": "super-light-purple",
+                  "value": 100000000000
+                }
+              ]
+            },
+            "nodeValueField": "Total_Volume",
+            "nodeWidth": 5,
+            "outboundValueField": "In_Volume",
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "srcField": "Booth",
+            "visible": true
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": true,
+            "mapjson": "{\"edges\":[],\"nodes\":[]}",
+            "name": "Layer 2",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": true
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": true,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 3",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": true
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 4",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 5",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 6",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 7",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 8",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 9",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 10",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 11",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 12",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 13",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 14",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 15",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 16",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 17",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 18",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 19",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 20",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          }
+        ],
+        "legendColumnLength": 3,
+        "legendDefaultBehavior": "visible",
+        "legendPosition": "bottomleft",
+        "showLegend": true,
+        "showSidebar": false,
+        "showViewControls": true,
+        "tileset": {
+          "geographic": "arcgis"
+        },
+        "topologySource": "url",
+        "viewport": {
+          "center": {
+            "lat": 39,
+            "lng": -98
+          },
+          "zoom": 5
+        }
+      },
+      "pluginVersion": "3.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  sum(bit_count)/8 AS In_Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL AND $__timeFilter(start_time)\n  GROUP BY Booth\n  ORDER BY In_Volume DESC\n  LIMIT 100\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  sum(bit_count)/8 AS Out_Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL AND $__timeFilter(start_time)\n  GROUP BY Booth\n  ORDER BY Out_Volume DESC\n  LIMIT 100",
+          "refId": "B"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total_Volume",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "In_Volume",
+                "Out_Volume"
+              ],
+              "reducer": "sum"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "esnet-networkmap-panel"
+    },
+    {
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<center>\n<h1>Which booths are using the most data?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');\n  h1 {\n    font-family: \"Stack Sans Text\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #c2b8fd;\n  }\n</style>",
+        "mode": "html"
+      },
+      "pluginVersion": "12.2.1",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Volume"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Booth"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 3
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.dst_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL AND $__timeFilter(start_time)\n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC\n  LIMIT 7",
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          }
+        }
+      ],
+      "title": "Top Booths by Volume (Incoming)",
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Volume"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Booth"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.src_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL AND $__timeFilter(start_time)\n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC\n  LIMIT 7",
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          }
+        }
+      ],
+      "title": "Top Booths by Volume (Outgoing)",
+      "transparent": true,
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-11-20T06:00:00.000Z",
+    "to": "2025-11-21T05:59:59.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Booth Map",
+  "uid": "adcm2hj",
+  "version": 42,
+  "weekStart": ""
+}

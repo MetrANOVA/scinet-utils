@@ -1,0 +1,735 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_ESNET-CLICKHOUSE",
+      "label": "esnet-clickhouse",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-clickhouse-datasource",
+      "pluginName": "ClickHouse"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "esnet-networkmap-panel",
+      "name": "Network Map Panel",
+      "version": "3.1.0"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.2.1"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.11.2"
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 3,
+        "w": 23,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<center>\n<h1>How much SCinet traffic is on the Energy Sciences Network (ESnet)?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');\n  h1 {\n    font-family: \"Stack Sans Text\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #c2b8fd;\n  }\n</style>",
+        "mode": "html"
+      },
+      "pluginVersion": "12.2.1",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_ESNET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#808080",
+                  "index": 0,
+                  "text": "0"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#00608ccc",
+                "value": 0
+              },
+              {
+                "color": "#0075a2",
+                "value": 10000000
+              },
+              {
+                "color": "#00a0d6",
+                "value": 1000000000
+              },
+              {
+                "color": "#64d2ff",
+                "value": 10000000000
+              },
+              {
+                "color": "#cff1ff",
+                "value": 100000000000
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 22,
+        "x": 1,
+        "y": 3
+      },
+      "id": 5,
+      "options": {
+        "background": "#EDEDED",
+        "configurationUrl": "",
+        "customEdgeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>\n      ${forward.from} → ${forward.to}\n      <br />\n      Rate: ${forward.dataPoint}\n    </strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <span>\n      ${reverse.from} → ${reverse.to}\n      <br />\n      Rate: ${reverse.dataPoint}\n    </span>\n  </div>\n",
+        "customNodeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>${name}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>In Volume: ${inValue}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>Out Volume: ${outValue}</strong>\n  </div>\n",
+        "enableCustomEdgeTooltip": false,
+        "enableCustomNodeTooltip": false,
+        "enableEdgeAnimation": false,
+        "enableEditing": true,
+        "enableNodeAnimation": true,
+        "enableScrolling": true,
+        "initialViewStrategy": "static",
+        "layerLimit": 1,
+        "layers": [
+          {
+            "color": "#80808080",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "dstField": "src_node",
+            "edgeWidth": 3,
+            "endpointId": "pops",
+            "inboundValueField": "in_rate",
+            "legend": false,
+            "mapjson": "{\"name\":\"ESnet Layer 1: Core Circuits\",\"layer\":\"core\",\"pathLayout\":{\"type\":\"curveCardinal\",\"tension\":0.6},\"edges\":[{\"name\":\"ALBQ--DENV\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ALBQ\",\"DENV\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[37.03282075203296,-104.92514721620952],[39.745837985537946,-104.97950904071331]]},{\"name\":\"ALBQ--ELPA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ALBQ\",\"ELPA\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[33.42235098592937,-106.57094155903906],[31.75638997927308,-106.48972003720701]]},{\"name\":\"ALBQ--LANLTA03\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ALBQ\",\"LANLTA03\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[35.504449088025126,-106.59196015569566],[35.88999995961785,-106.31000004708767]]},{\"name\":\"ALBQ--SNLNM\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ALBQ\",\"SNLNM\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[35.07446764502674,-106.59340040758252],[35.06062329746783,-106.53463773429394]]},{\"name\":\"AMESHWH--AMESHWHB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"AMESHWH\",\"AMESHWHB\"]}},\"coordinates\":[[42.03027997165918,-93.64751005545259],[42.03027997165918,-93.64751005545259],[42.03027997165918,-93.64751005545259]]},{\"name\":\"AMESHWHB--CHIC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"AMESHWHB\",\"CHIC\"]}},\"coordinates\":[[42.03027997165918,-93.64751005545259],[42.65787313674462,-90.63109411995805],[41.8976419698447,-87.64339095912874]]},{\"name\":\"ANL221--ANL541B\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ANL221\",\"ANL541B\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.71133428579196,-87.98216921277344],[41.70705739874393,-87.98081737942994]]},{\"name\":\"ANL221--CHIC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ANL221\",\"CHIC\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.80662657134235,-87.81345600262284],[41.8976419698447,-87.64339095912874]]},{\"name\":\"ANL221--FNALFCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ANL221\",\"FNALFCC\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.778538583312184,-88.11923503875732],[41.84146599378437,-88.2549490313977]]},{\"name\":\"ANL541B--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ANL541B\",\"EQXCH2\"]}},\"coordinates\":[[41.70705739874393,-87.98081737942994],[41.780353432986885,-87.79957980383188],[41.85364946722984,-87.61834222823381]]},{\"name\":\"ANL541B--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ANL541B\",\"STAR\"]}},\"coordinates\":[[41.70705739874393,-87.98081737942994],[41.80161654017866,-87.79907202813774],[41.896175681613386,-87.61732667684555]]},{\"name\":\"ATLA--CHAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ATLA\",\"CHAT\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[34.394636414945126,-84.84269389417022],[35.03056696616113,-85.29741704463959]]},{\"name\":\"ATLA--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ATLA\",\"HOUS\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[30.587761408242827,-89.27347007100883],[29.941775961779058,-95.41717607527971]]},{\"name\":\"ATLA--JLAB205\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ATLA\",\"JLAB205\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[34.85298229678263,-79.66064967164542],[37.04987303499561,-76.4932485357611]]},{\"name\":\"ATLA--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ATLA\",\"WASH\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[36.80188473979264,-79.34708920186932],[40.34605999477208,-74.61537002585828]]},{\"name\":\"BNL515--BNL515B\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BNL515\",\"BNL515B\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.86611157283187,-72.87094711326063],[40.86611157283187,-72.87094711326063]]},{\"name\":\"BNL515--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BNL515\",\"NEWY1118TH\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.803753775544465,-73.43710657674819],[40.74139597825706,-74.00326604023576]]},{\"name\":\"BNL515--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BNL515\",\"NEWY32AOA\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.79307164764032,-73.43773186672479],[40.720031722448766,-74.00451662018895]]},{\"name\":\"BNL515B--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BNL515B\",\"NEWY32AOA\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.60608578380197,-73.74315856955945],[40.34605999477208,-74.61537002585828]]},{\"name\":\"BOIS--INLEIL\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOIS\",\"INLEIL\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[43.452166611848554,-114.57703872523456],[43.492017827409775,-112.13897884783557]]},{\"name\":\"BOIS--PNNLISB2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOIS\",\"PNNLISB2\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[45.3559428764376,-117.6705608743468],[46.348853996023536,-119.27458606660366]]},{\"name\":\"BOIS--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOIS\",\"SALT\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[42.17525723003145,-115.40535935170196],[40.75628999155015,-111.95481603965163]]},{\"name\":\"BOIS--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOIS\",\"SEAT\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[45.61736501797996,-120.09433509501554],[47.66608735914163,-122.33437131506298]]},{\"name\":\"BOST--EQXAM3\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOST\",\"EQXAM3\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[52.747081995218956,-35.657663746398235],[52.3546756664291,4.959119316190481]]},{\"name\":\"BOST--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOST\",\"EQXCH2\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[42.448524171806284,-78.59971742624154],[41.85364946722984,-87.61834222823381]]},{\"name\":\"BOST--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"BOST\",\"NEWY1118TH\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[41.554433985147625,-72.54483353812248],[40.74139597825706,-74.00326604023576]]},{\"name\":\"CERN513--CERN773\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CERN513\",\"CERN773\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[46.24545119237155,6.0650004632771015],[46.255994914099574,6.055021891370416]]},{\"name\":\"CERN513--EQXAM3\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CERN513\",\"EQXAM3\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[49.425173692874424,6.245416972209427],[52.3546756664291,4.959119316190481]]},{\"name\":\"CERN513--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CERN513\",\"WASH\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[42.01072777144423,-34.1077567051026],[40.34605999477208,-74.61537002585828]]},{\"name\":\"CERN773--EQXLD8\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CERN773\",\"EQXLD8\"]}},\"coordinates\":[[46.255994914099574,6.055021891370416],[48.649984054840566,1.9588161053887456],[51.49806946981698,-0.014360547065734863]]},{\"name\":\"CHAT--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHAT\",\"NASH\"]}},\"coordinates\":[[35.03056696616113,-85.29741704463959],[35.56643697666004,-86.02623404469341],[36.102306987158954,-86.75505104474723]]},{\"name\":\"CHAT--ORNL1064\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHAT\",\"ORNL1064\"]}},\"coordinates\":[[35.03056696616113,-85.29741704463959],[35.476662979926914,-84.81063952669501],[35.922758993692696,-84.32386200875044]]},{\"name\":\"CHIC--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"EQXCH2\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.87564571853727,-87.63086659368128],[41.85364946722984,-87.61834222823381]]},{\"name\":\"CHIC--FNALGCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"FNALGCC\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.87440838199109,-87.9432290699333],[41.85117479413748,-88.24306718073785]]},{\"name\":\"CHIC--FRIB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"FRIB\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[42.93149524810714,-86.77791458966416],[42.76258548124057,-84.55384298371123]]},{\"name\":\"CHIC--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"KANS\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[40.0597703991828,-91.01607855772217],[39.10085497889668,-94.5823800098151]]},{\"name\":\"CHIC--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"NASH\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[38.99997447850183,-87.19922100193799],[36.102306987158954,-86.75505104474723]]},{\"name\":\"CHIC--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"CHIC\",\"STAR\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.89690882572904,-87.63035881798714],[41.896175681613386,-87.61732667684555]]},{\"name\":\"DENV--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"DENV\",\"KANS\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.88985998329429,-100.25444249483573],[39.10085497889668,-94.5823800098151]]},{\"name\":\"DENV--LANLTA50\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"DENV\",\"LANLTA50\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[37.92057495450417,-106.66529281053582],[35.88999995961785,-106.31000004708767]]},{\"name\":\"DENV--NRELESIF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"DENV\",\"NRELESIF\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.743293973151594,-105.07404953241348],[39.74074996076524,-105.16859002411366]]},{\"name\":\"DENV--NRELRSF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"DENV\",\"NRELRSF\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.74300993140787,-105.07877487223595],[39.74018187727779,-105.1780407037586]]},{\"name\":\"DENV--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"DENV\",\"SALT\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[40.25106398854405,-108.46716254018247],[40.75628999155015,-111.95481603965163]]},{\"name\":\"ELPA--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ELPA\",\"HOUS\"]}},\"coordinates\":[[31.75638997927308,-106.48972003720701],[30.041639348095305,-101.51085999028318],[29.941775961779058,-95.41717607527971]]},{\"name\":\"ELPA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ELPA\",\"SAND\"]}},\"coordinates\":[[31.75638997927308,-106.48972003720701],[31.249711943450702,-112.153455245838],[32.809036988765,-117.13589804247022]]},{\"name\":\"EQXAM3--EQXLD8\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXAM3\",\"EQXLD8\"]}},\"coordinates\":[[52.3546756664291,4.959119316190481],[51.659824198715825,2.4343408157495405],[51.49806946981698,-0.014360547065734863]]},{\"name\":\"EQXCH2--EQXDC4\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXCH2\",\"EQXDC4\"]}},\"coordinates\":[[41.85364946722984,-87.61834222823381],[40.43499772902578,-82.53842464182526],[39.01634599082172,-77.4585070554167]]},{\"name\":\"EQXCH2--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXCH2\",\"STAR\"]}},\"coordinates\":[[41.85364946722984,-87.61834222823381],[41.874912574421614,-87.61783445253968],[41.896175681613386,-87.61732667684555]]},{\"name\":\"EQXDA3--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDA3\",\"HOUS\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[31.371036318596452,-96.11944511532784],[29.941775961779058,-95.41717607527971]]},{\"name\":\"EQXDA3--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDA3\",\"KANS\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[35.95057582715526,-95.70204708259553],[39.10085497889668,-94.5823800098151]]},{\"name\":\"EQXDA3--PANTEX\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDA3\",\"PANTEX\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[34.29407902890142,-98.9241180878914],[35.284741767682135,-101.5466432645917]]},{\"name\":\"EQXDC4--GERMANTOWN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDC4\",\"GERMANTOWN\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.07894501768422,-77.37318840129406],[39.14154404454673,-77.28786974717141]]},{\"name\":\"EQXDC4--JLAB12\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDC4\",\"JLAB12\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[38.064097516633524,-76.9758777955889],[37.11184904244533,-76.4932485357611]]},{\"name\":\"EQXDC4--NETLMGN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDC4\",\"NETLMGN\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.34031293960288,-78.71760101057589],[39.664279888384044,-79.97669496573508]]},{\"name\":\"EQXDC4--NETLPGH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDC4\",\"NETLPGH\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.67111453413963,-78.72238129377365],[40.32588307745755,-79.9862555321306]]},{\"name\":\"EQXDC4--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXDC4\",\"WASH\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.6812029927969,-76.0369385406375],[40.34605999477208,-74.61537002585828]]},{\"name\":\"EQXLD8--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXLD8\",\"NEWY1118TH\"]}},\"coordinates\":[[51.49806946981698,-0.014360547065734863],[51.20202743857322,-33.98534124092566],[40.74139597825706,-74.00326604023576]]},{\"name\":\"EQXLD8--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXLD8\",\"NEWY32AOA\"]}},\"coordinates\":[[51.49806946981698,-0.014360547065734863],[46.65897800444833,-33.36868759013353],[40.34605999477208,-74.61537002585828]]},{\"name\":\"EQXSV5--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXSV5\",\"LOSA\"]}},\"coordinates\":[[37.2417666669935,-121.78296698257327],[36.13456647126862,-119.34349642634146],[34.049020959064364,-118.25974705629051]]},{\"name\":\"EQXSV5--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"EQXSV5\",\"SUNN\"]}},\"coordinates\":[[37.2417666669935,-121.78296698257327],[37.30760582489893,-121.88539199531078],[37.37344498280436,-121.9878170080483]]},{\"name\":\"FNALFCC--FNALGCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"FNALFCC\",\"FNALGCC\"]}},\"coordinates\":[[41.84146599378437,-88.2549490313977],[41.84632039396092,-88.24900810606778],[41.85117479413748,-88.24306718073785]]},{\"name\":\"FORRESTAL--GERMANTOWN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"FORRESTAL\",\"GERMANTOWN\"]}},\"coordinates\":[[38.88815668411553,-76.99202757328749],[39.014850364331124,-77.13994866022945],[39.14154404454673,-77.28786974717141]]},{\"name\":\"FORRESTAL--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"FORRESTAL\",\"WASH\"]}},\"coordinates\":[[38.88815668411553,-76.99202757328749],[39.6171083394438,-75.80369879957289],[40.34605999477208,-74.61537002585828]]},{\"name\":\"FRIB--FRIB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"FRIB\",\"FRIB\"]}},\"coordinates\":[[42.80309866662815,-84.58622695785051],[42.76258548124057,-84.55384298371123]]},{\"name\":\"GA--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"GA\",\"LOSA\"]}},\"coordinates\":[[32.89381956215948,-117.23594452254474],[33.47142026061192,-117.74784578941762],[34.049020959064364,-118.25974705629051]]},{\"name\":\"GA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"GA\",\"SAND\"]}},\"coordinates\":[[32.89381956215948,-117.23594452254474],[32.85142827546224,-117.18592128250748],[32.809036988765,-117.13589804247022]]},{\"name\":\"HOUS--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"HOUS\",\"NASH\"]}},\"coordinates\":[[29.941775961779058,-95.41717607527971],[33.37322780413478,-91.45952002670361],[36.102306987158954,-86.75505104474723]]},{\"name\":\"HOUS--PANTEX\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"HOUS\",\"PANTEX\"]}},\"coordinates\":[[29.941775961779058,-95.41717607527971],[32.222087618865956,-99.26957261092059],[35.284741767682135,-101.5466432645917]]},{\"name\":\"INLEIL--INLEROB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"INLEIL\",\"INLEROB\"]}},\"coordinates\":[[43.492017827409775,-112.13897884783557],[43.62697455044247,-112.1697013495424],[43.76193127347516,-112.20042385124921]]},{\"name\":\"INLEROB--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"INLEROB\",\"SALT\"]}},\"coordinates\":[[43.51762999780476,-112.04925008118153],[42.136959994677454,-112.00203306041658],[40.75628999155015,-111.95481603965163]]},{\"name\":\"JLAB12--JLAB205\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"JLAB12\",\"JLAB205\"]}},\"coordinates\":[[37.11184904244533,-76.4932485357611],[37.08086103872047,-76.4932485357611],[37.04987303499561,-76.4932485357611]]},{\"name\":\"KANS--KCNSC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"KANS\",\"KCNSC\"]}},\"coordinates\":[[39.10085497889668,-94.5823800098151],[39.10085497889668,-94.5823800098151],[39.10085497889668,-94.5823800098151]]},{\"name\":\"LANLTA03--LANLTA50\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LANLTA03\",\"LANLTA50\"]}},\"coordinates\":[[35.88999995961785,-106.31000004708767],[35.88999995961785,-106.31000004708767],[35.88999995961785,-106.31000004708767]]},{\"name\":\"LASV--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LASV\",\"LOSA\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[35.14303046045825,-116.68852904811502],[34.049020959064364,-118.25974705629051]]},{\"name\":\"LASV--NNSS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LASV\",\"NNSS\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[36.222119461745024,-115.12674902100116],[36.207198961637914,-115.1361870020628]]},{\"name\":\"LASV--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LASV\",\"SALT\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[38.49666497670114,-113.53606353979558],[40.75628999155015,-111.95481603965163]]},{\"name\":\"LBNL50--LBNL59\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LBNL50\",\"LBNL59\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[37.87598446011543,-122.25001425482333],[37.87598446011543,-122.25001425482333]]},{\"name\":\"LBNL50--SACR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LBNL50\",\"SACR\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[38.231370218563825,-121.89010015223175],[38.58675597701222,-121.53018604964018]]},{\"name\":\"LBNL59--SLAC50N\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LBNL59\",\"SLAC50N\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[37.65199865447357,-122.21368737984449],[37.42801284883171,-122.17736050486565]]},{\"name\":\"LLNL--SNLCA902\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LLNL\",\"SNLCA902\"]}},\"coordinates\":[[37.67975574976167,-121.70997287939964],[37.682040591647514,-121.70767977858601]]},{\"name\":\"LLNL--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LLNL\",\"SUNN\"]}},\"coordinates\":[[37.679794994182885,-121.7107670288533],[37.52661998849362,-121.8492920184508],[37.37344498280436,-121.9878170080483]]},{\"name\":\"LOSA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LOSA\",\"SAND\"]}},\"coordinates\":[[34.049020959064364,-118.25974705629051],[33.42902897391468,-117.69782254938036],[32.809036988765,-117.13589804247022]]},{\"name\":\"LOSA--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"LOSA\",\"SUNN\"]}},\"coordinates\":[[34.049020959064364,-118.25974705629051],[35.32738325534613,-121.08364202066775],[37.37344498280436,-121.9878170080483]]},{\"name\":\"NASH--ORNL5600\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NASH\",\"ORNL5600\"]}},\"coordinates\":[[36.102306987158954,-86.75505104474723],[36.0157809779048,-85.5327330250293],[35.92925496865064,-84.31041500531137]]},{\"name\":\"NETLALB--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NETLALB\",\"SEAT\"]}},\"coordinates\":[[44.62018797174096,-123.12077715061605],[46.137332478538156,-122.72164550609887],[47.65447698533535,-122.32251386158168]]},{\"name\":\"NEWY1118TH--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NEWY1118TH\",\"NEWY32AOA\"]}},\"coordinates\":[[40.74139597825706,-74.00326604023576],[40.54372798651457,-74.30931803304702],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NEWY32AOA--PPPL\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NEWY32AOA\",\"PPPL\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NEWY32AOA--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NEWY32AOA\",\"WASH\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NRELESIF--NRELRSF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"NRELESIF\",\"NRELRSF\"]}},\"coordinates\":[[39.74074996076524,-105.16859002411366],[39.74046591902152,-105.17331536393613],[39.74018187727779,-105.1780407037586]]},{\"name\":\"ORAU--ORNL1064\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORAU\",\"ORNL1064\"]}},\"coordinates\":[[36.04368026833981,-84.21039635315537],[35.983219631016254,-84.2671291809529],[35.922758993692696,-84.32386200875044]]},{\"name\":\"ORNL1064--ORNL5600\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORNL1064\",\"ORNL5600\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.92600698117167,-84.3171385070309],[35.92925496865064,-84.31041500531137]]},{\"name\":\"ORNL1064--OSTI\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORNL1064\",\"OSTI\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.983219631016254,-84.2671291809529],[36.04368026833981,-84.21039635315537]]},{\"name\":\"ORNL1064--Y12\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORNL1064\",\"Y12\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.959034487605095,-84.28075103089213],[35.995309981517494,-84.23764005303383]]},{\"name\":\"ORNL5600--OSTI\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORNL5600\",\"OSTI\"]}},\"coordinates\":[[35.92925496865064,-84.31041500531137],[35.986467618495226,-84.26040567923337],[36.04368026833981,-84.21039635315537]]},{\"name\":\"ORNL5600--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"ORNL5600\",\"WASH\"]}},\"coordinates\":[[35.92925496865064,-84.31041500531137],[38.53910478215108,-79.86968998482948],[40.34605999477208,-74.61537002585828]]},{\"name\":\"PNNLEMSL--PNNLISB2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"PNNLEMSL\",\"PNNLISB2\"]}},\"coordinates\":[[46.3483049813658,-119.27836102433503],[46.34857948869467,-119.27647354546934],[46.348853996023536,-119.27458606660366]]},{\"name\":\"PNNLEMSL--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"PNNLEMSL\",\"SEAT\"]}},\"coordinates\":[[46.3483049813658,-119.27836102433503],[47.007196170253714,-120.806366169699],[47.66608735914163,-122.33437131506298]]},{\"name\":\"PPPL--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"PPPL\",\"WASH\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"SACR--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"SACR\",\"SALT\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[40.34201501730294,-116.80959067014325],[40.75628999155015,-111.95481603965163]]},{\"name\":\"SACR--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"SACR\",\"SEAT\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[42.78659631207029,-121.30186102523152],[47.66608735914163,-122.33437131506298]]},{\"name\":\"SACR--SNLCA902\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"SACR\",\"SNLCA902\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[38.13327548559755,-121.62047653924674],[37.679794994182885,-121.7107670288533]]},{\"name\":\"SLAC50N--SLAC50S\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"SLAC50N\",\"SLAC50S\"]}},\"coordinates\":[[37.42801284883171,-122.17736050486565],[37.42801284883171,-122.17736050486565],[37.42801284883171,-122.17736050486565]]},{\"name\":\"SLAC50S--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"pops\":[\"SLAC50S\",\"SUNN\"]}},\"coordinates\":[[37.42801284883171,-122.17736050486565],[37.400728915818036,-122.08258875645697],[37.37344498280436,-121.9878170080483]]}],\"nodes\":[{\"name\":\"ALBQ\",\"meta\":{},\"coordinate\":[35.08831199258566,-106.6521630808711]},{\"name\":\"AMESHWH\",\"meta\":{},\"coordinate\":[42.03027997165918,-93.64751005545259]},{\"name\":\"AMESHWHB\",\"meta\":{},\"coordinate\":[42.03027997165918,-93.64751005545259]},{\"name\":\"ANL221\",\"meta\":{},\"coordinate\":[41.71561117284,-87.98352104611695]},{\"name\":\"ANL541B\",\"meta\":{},\"coordinate\":[41.70705739874393,-87.98081737942994]},{\"name\":\"ATLA\",\"meta\":{},\"coordinate\":[33.75870586372912,-84.38797074370086]},{\"name\":\"BNL515\",\"meta\":{},\"coordinate\":[40.86611157283187,-72.87094711326063]},{\"name\":\"BNL515B\",\"meta\":{},\"coordinate\":[40.86611157283187,-72.87094711326063]},{\"name\":\"BOIS\",\"meta\":{},\"coordinate\":[44.00482996366918,-116.96587004698813]},{\"name\":\"BOST\",\"meta\":{},\"coordinate\":[42.36747199203819,-71.08640103600919]},{\"name\":\"CERN513\",\"meta\":{},\"coordinate\":[46.23490747064352,6.074979035183787]},{\"name\":\"CERN773\",\"meta\":{},\"coordinate\":[46.255994914099574,6.055021891370416]},{\"name\":\"CHAT\",\"meta\":{},\"coordinate\":[35.03056696616113,-85.29741704463959]},{\"name\":\"CHIC\",\"meta\":{},\"coordinate\":[41.8976419698447,-87.64339095912874]},{\"name\":\"DENV\",\"meta\":{},\"coordinate\":[39.745837985537946,-104.97950904071331]},{\"name\":\"ELPA\",\"meta\":{},\"coordinate\":[31.75638997927308,-106.48972003720701]},{\"name\":\"EQXAM3\",\"meta\":{},\"coordinate\":[52.3546756664291,4.959119316190481]},{\"name\":\"EQXCH2\",\"meta\":{},\"coordinate\":[41.85364946722984,-87.61834222823381]},{\"name\":\"EQXDA3\",\"meta\":{},\"coordinate\":[32.80029667541385,-96.82171415537596]},{\"name\":\"EQXDC4\",\"meta\":{},\"coordinate\":[39.01634599082172,-77.4585070554167]},{\"name\":\"EQXLD8\",\"meta\":{},\"coordinate\":[51.49806946981698,-0.014360547065734863]},{\"name\":\"EQXSV5\",\"meta\":{},\"coordinate\":[37.2417666669935,-121.78296698257327]},{\"name\":\"FNALFCC\",\"meta\":{},\"coordinate\":[41.84146599378437,-88.2549490313977]},{\"name\":\"FNALGCC\",\"meta\":{},\"coordinate\":[41.85117479413748,-88.24306718073785]},{\"name\":\"FORRESTAL\",\"meta\":{},\"coordinate\":[38.88815668411553,-76.99202757328749]},{\"name\":\"FRIB\",\"meta\":{},\"coordinate\":[42.76258548124057,-84.55384298371123]},{\"name\":\"GA\",\"meta\":{},\"coordinate\":[32.89381956215948,-117.23594452254474]},{\"name\":\"GERMANTOWN\",\"meta\":{},\"coordinate\":[39.180948212742805,-77.25637586787343]},{\"name\":\"HOUS\",\"meta\":{},\"coordinate\":[29.941775961779058,-95.41717607527971]},{\"name\":\"INLEIL\",\"meta\":{},\"coordinate\":[43.492017827409775,-112.13897884783557]},{\"name\":\"INLEROB\",\"meta\":{},\"coordinate\":[43.76193127347516,-112.20042385124921]},{\"name\":\"JLAB12\",\"meta\":{},\"coordinate\":[37.11184904244533,-76.4932485357611]},{\"name\":\"JLAB205\",\"meta\":{},\"coordinate\":[37.04987303499561,-76.4932485357611]},{\"name\":\"KANS\",\"meta\":{},\"coordinate\":[39.10085497889668,-94.5823800098151]},{\"name\":\"KCNSC\",\"meta\":{},\"coordinate\":[38.862869990989566,-94.54657000489533]},{\"name\":\"LANLTA03\",\"meta\":{},\"coordinate\":[35.88999995961785,-106.31000004708767]},{\"name\":\"LANLTA50\",\"meta\":{},\"coordinate\":[35.88999995961785,-106.31000004708767]},{\"name\":\"LASV\",\"meta\":{},\"coordinate\":[36.23703996185213,-115.11731103993952]},{\"name\":\"LBNL50\",\"meta\":{},\"coordinate\":[37.87598446011543,-122.25001425482333]},{\"name\":\"LBNL59\",\"meta\":{},\"coordinate\":[37.87598446011543,-122.25001425482333]},{\"name\":\"LLNL\",\"meta\":{},\"coordinate\":[37.679794994182885,-121.7107670288533]},{\"name\":\"LOSA\",\"meta\":{},\"coordinate\":[34.049020959064364,-118.25974705629051]},{\"name\":\"NASH\",\"meta\":{},\"coordinate\":[36.102306987158954,-86.75505104474723]},{\"name\":\"NETLALB\",\"meta\":{},\"coordinate\":[44.62018797174096,-123.12077715061605]},{\"name\":\"NETLMGN\",\"meta\":{},\"coordinate\":[39.664279888384044,-79.97669496573508]},{\"name\":\"NETLPGH\",\"meta\":{},\"coordinate\":[40.32588307745755,-79.9862555321306]},{\"name\":\"NEWY1118TH\",\"meta\":{},\"coordinate\":[40.74139597825706,-74.00326604023576]},{\"name\":\"NEWY32AOA\",\"meta\":{},\"coordinate\":[40.720031722448766,-74.00451662018895]},{\"name\":\"NNSS\",\"meta\":{},\"coordinate\":[36.207198961637914,-115.1361870020628]},{\"name\":\"NRELESIF\",\"meta\":{},\"coordinate\":[39.74074996076524,-105.16859002411366]},{\"name\":\"NRELRSF\",\"meta\":{},\"coordinate\":[39.74018187727779,-105.1780407037586]},{\"name\":\"ORAU\",\"meta\":{},\"coordinate\":[36.04368026833981,-84.21039635315537]},{\"name\":\"ORNL1064\",\"meta\":{},\"coordinate\":[35.922758993692696,-84.32386200875044]},{\"name\":\"ORNL5600\",\"meta\":{},\"coordinate\":[35.92925496865064,-84.31041500531137]},{\"name\":\"OSTI\",\"meta\":{},\"coordinate\":[36.04368026833981,-84.21039635315537]},{\"name\":\"PANTEX\",\"meta\":{},\"coordinate\":[35.284741767682135,-101.5466432645917]},{\"name\":\"PNNLEMSL\",\"meta\":{},\"coordinate\":[46.3483049813658,-119.27836102433503]},{\"name\":\"PNNLISB2\",\"meta\":{},\"coordinate\":[46.348853996023536,-119.27458606660366]},{\"name\":\"PPPL\",\"meta\":{},\"coordinate\":[40.34605999477208,-74.61537002585828]},{\"name\":\"SACR\",\"meta\":{},\"coordinate\":[38.58675597701222,-121.53018604964018]},{\"name\":\"SALT\",\"meta\":{},\"coordinate\":[40.75628999155015,-111.95481603965163]},{\"name\":\"SAND\",\"meta\":{},\"coordinate\":[32.809036988765,-117.13589804247022]},{\"name\":\"SEAT\",\"meta\":{},\"coordinate\":[47.65447698533535,-122.32251386158168]},{\"name\":\"SLAC50N\",\"meta\":{},\"coordinate\":[37.42801284883171,-122.17736050486565]},{\"name\":\"SLAC50S\",\"meta\":{},\"coordinate\":[37.42801284883171,-122.17736050486565]},{\"name\":\"SNLCA902\",\"meta\":{},\"coordinate\":[37.682040591647514,-121.70767977858601]},{\"name\":\"SNLNM\",\"meta\":{},\"coordinate\":[35.06062329746783,-106.53463773429394]},{\"name\":\"STAR\",\"meta\":{},\"coordinate\":[41.896175681613386,-87.61732667684555]},{\"name\":\"SUNN\",\"meta\":{},\"coordinate\":[37.37344498280436,-121.9878170080483]},{\"name\":\"WASH\",\"meta\":{},\"coordinate\":[38.92004697583616,-77.21159806475043]},{\"name\":\"Y12\",\"meta\":{},\"coordinate\":[35.995309981517494,-84.23764005303383]}]}",
+            "name": "Layer 1",
+            "nodeThresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "#808080",
+                  "value": 0
+                }
+              ]
+            },
+            "nodeWidth": 5,
+            "outboundValueField": "out_rate",
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "srcField": "dst_node",
+            "visible": true
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[],\"nodes\":[]}",
+            "name": "Layer 2",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": true,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 3",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": true
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 4",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 5",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 6",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 7",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 8",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 9",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 10",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 11",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 12",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 13",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 14",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 15",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 16",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 17",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 18",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 19",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          },
+          {
+            "color": "grey",
+            "dashboardEdgeDstVar": "dest",
+            "dashboardEdgeSrcVar": "source",
+            "dashboardNodeVar": "node",
+            "edgeWidth": 3,
+            "endpointId": "names",
+            "legend": false,
+            "mapjson": "{\"edges\":[], \"nodes\":[]}",
+            "name": "Layer 20",
+            "nodeWidth": 5,
+            "pathOffset": 3,
+            "remoteUrl": "",
+            "visible": false
+          }
+        ],
+        "legendColumnLength": 3,
+        "legendDefaultBehavior": "visible",
+        "legendPosition": "bottomright",
+        "showLegend": true,
+        "showSidebar": false,
+        "showViewControls": false,
+        "tileset": {
+          "geographic": "cartodb.labeled"
+        },
+        "topologySource": "json",
+        "viewport": {
+          "center": {
+            "lat": 41.8123120610767,
+            "lng": -60.847021485078926
+          },
+          "zoom": 3.75
+        }
+      },
+      "pluginVersion": "3.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_ESNET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "SELECT\n  device.location_name as src_node,\n  remote_device.location_name AS dst_node,\n  sum(bit_count)/($__toTime - $__fromTime) AS out_rate\nFROM\n  data_flow AS flow\n  INNER JOIN meta_device AS device ON device.ref = flow.device_ref\n  INNER JOIN meta_interface AS iface ON flow.out_interface_ref = iface.ref\n  INNER JOIN meta_interface AS remote_iface ON remote_iface.ref = iface.remote_interface_ref\n  INNER JOIN meta_device AS remote_device ON remote_device.ref = remote_iface.device_ref\nWHERE\n  src_as_id IN (401015, 14031) OR dst_as_id IN (401015, 14031)\nGROUP BY src_node, dst_node",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_ESNET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "SELECT\n  device.location_name as src_node,\n  remote_device.location_name AS dst_node,\n  sum(bit_count)/($__toTime - $__fromTime) AS in_rate\nFROM\n  data_flow AS flow\n  INNER JOIN meta_device AS device ON device.ref = flow.device_ref\n  INNER JOIN meta_interface AS iface ON flow.in_interface_ref = iface.ref\n  INNER JOIN meta_interface AS remote_iface ON remote_iface.ref = iface.remote_interface_ref\n  INNER JOIN meta_device AS remote_device ON remote_device.ref = remote_iface.device_ref\nWHERE\n  src_as_id IN (401015, 14031) OR dst_as_id IN (401015, 14031)\nGROUP BY src_node, dst_node",
+          "refId": "B"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "esnet-networkmap-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_ESNET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SCinet To ESnet Traffic"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ESnet to SCinet Traffic"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 22,
+        "x": 1,
+        "y": 14
+      },
+      "id": 3,
+      "maxDataPoints": 100,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_ESNET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 0,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "timeseries",
+          "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  sum(bit_count)/$__interval_s as Traffic\nFROM\n  data_flow\nWHERE\n  $__timeFilter(start_time)\n  AND src_as_id IN (14031, 401015)\n  AND in_interface_edge = True\nGROUP BY\n  time\nORDER BY\n  time ASC",
+          "refId": "SCinet To ESnet"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_ESNET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 0,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "",
+              "limit": 1000,
+              "mode": "list",
+              "queryType": "table",
+              "table": ""
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "timeseries",
+          "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  sum(bit_count)/$__interval_s as Traffic\nFROM\n  data_flow\nWHERE\n  $__timeFilter(start_time)\n  AND dst_as_id IN (14031, 401015)\n  AND in_interface_edge = True\nGROUP BY\n  time\nORDER BY\n  time ASC",
+          "refId": "ESnet to SCinet"
+        }
+      ],
+      "transparent": true,
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-11-20T06:00:00.000Z",
+    "to": "2025-11-21T05:59:59.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "External Traffic Explorer",
+  "uid": "ad6hcz2",
+  "version": 41,
+  "weekStart": "",
+  "id": null
+}

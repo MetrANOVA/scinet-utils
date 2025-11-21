@@ -1,0 +1,556 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_SCINET-CLICKHOUSE",
+      "label": "scinet-clickhouse",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-clickhouse-datasource",
+      "pluginName": "ClickHouse"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.2.1"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.11.2"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<center>\n<h1>How fast is data moving over SCinet?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');\n  h1 {\n    font-family: \"Stack Sans Text\", sans-serif;\n    font-size: 32pt;\n    font-weight: 500;\n    color: #c2b8fd;\n  }\n</style>",
+        "mode": "html"
+      },
+      "pluginVersion": "12.2.1",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#b464a8",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 100,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "B outgoing"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 22,
+        "x": 1,
+        "y": 3
+      },
+      "id": 3,
+      "interval": "30s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "builderOptions": {
+            "columns": [],
+            "database": "metranova",
+            "limit": 1000,
+            "meta": {},
+            "mode": "list",
+            "queryType": "table",
+            "table": "data_flow"
+          },
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "columns": [],
+              "database": "metranova",
+              "limit": 1000,
+              "meta": {},
+              "mode": "list",
+              "queryType": "table",
+              "table": "data_flow"
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  SUM(bit_count)/$__interval_s AS incoming\nFROM\n  metranova.data_flow\nWHERE\n  $__timeFilter(time) AND device_id != '140.221.135.2'\nGROUP BY\n  time\nORDER BY\n  time\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Traffic Rate",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max(rate)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Max Rate"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Booth"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 125
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 11,
+        "x": 1,
+        "y": 22
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": true,
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "builderOptions": {
+            "aggregates": [],
+            "columns": [
+              {
+                "alias": "src_ip",
+                "custom": false,
+                "name": "src_ip",
+                "type": "IPv6"
+              },
+              {
+                "alias": "bit_count",
+                "custom": false,
+                "name": "bit_count",
+                "type": "UInt64"
+              }
+            ],
+            "database": "metranova",
+            "filters": [],
+            "groupBy": [],
+            "limit": 1000,
+            "meta": {},
+            "mode": "list",
+            "orderBy": [],
+            "queryType": "table",
+            "table": "data_flow"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "aggregates": [],
+              "columns": [
+                {
+                  "alias": "src_ip",
+                  "custom": false,
+                  "name": "src_ip",
+                  "type": "IPv6"
+                },
+                {
+                  "alias": "bit_count",
+                  "custom": false,
+                  "name": "bit_count",
+                  "type": "UInt64"
+                }
+              ],
+              "database": "metranova",
+              "filters": [],
+              "groupBy": [],
+              "limit": 1000,
+              "meta": {},
+              "mode": "list",
+              "orderBy": [],
+              "queryType": "table",
+              "table": "data_flow"
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "SELECT Booth, Organization, max(rate)\nFROM (\n  SELECT \n    dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.dst_ip_scinet_ref) AS Organization,\n  sum(bit_count)/($__interval_s) AS rate,\n  $__timeInterval(start_time) as time\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, time, Organization\n  ORDER BY rate DESC\n)\nGROUP BY Booth, Organization\nORDER BY max(rate) DESC\nLIMIT 100",
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          }
+        }
+      ],
+      "title": "Booths with the most Incoming Traffic (Layer 3 only)",
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_SCINET-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max(rate)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Max Rate"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Booth"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 125
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 11,
+        "x": 12,
+        "y": 22
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": true,
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "builderOptions": {
+            "aggregates": [],
+            "columns": [
+              {
+                "alias": "src_ip",
+                "custom": false,
+                "name": "src_ip",
+                "type": "IPv6"
+              },
+              {
+                "alias": "bit_count",
+                "custom": false,
+                "name": "bit_count",
+                "type": "UInt64"
+              }
+            ],
+            "database": "metranova",
+            "filters": [],
+            "groupBy": [],
+            "limit": 1000,
+            "meta": {},
+            "mode": "list",
+            "orderBy": [],
+            "queryType": "table",
+            "table": "data_flow"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "aggregates": [],
+              "columns": [
+                {
+                  "alias": "src_ip",
+                  "custom": false,
+                  "name": "src_ip",
+                  "type": "IPv6"
+                },
+                {
+                  "alias": "bit_count",
+                  "custom": false,
+                  "name": "bit_count",
+                  "type": "UInt64"
+                }
+              ],
+              "database": "metranova",
+              "filters": [],
+              "groupBy": [],
+              "limit": 1000,
+              "meta": {},
+              "mode": "list",
+              "orderBy": [],
+              "queryType": "table",
+              "table": "data_flow"
+            }
+          },
+          "pluginVersion": "4.11.2",
+          "queryType": "table",
+          "rawSql": "SELECT Booth, Organization, max(rate)\nFROM (\n  SELECT \n    dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.src_ip_scinet_ref) AS Organization,\n  sum(bit_count)/($__interval_s) AS rate,\n  $__timeInterval(start_time) as time\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, time, Organization\n  ORDER BY rate DESC\n)\nGROUP BY Booth, Organization\nORDER BY max(rate) DESC\nLIMIT 100",
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_SCINET-CLICKHOUSE}"
+          }
+        }
+      ],
+      "title": "Booths with the most Outgoing Traffic (Layer 3 only)",
+      "transparent": true,
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-11-20T06:00:00.000Z",
+    "to": "2025-11-21T05:59:59.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Traffic Overview (rate)",
+  "uid": "addzqf4",
+  "version": 30,
+  "weekStart": "",
+  "id": null
+}
