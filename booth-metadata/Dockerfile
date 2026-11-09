@@ -18,5 +18,6 @@ RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Run the application
-CMD ["python", "booth_metadata.py"]
+# Run the application (script selected via docker-compose command)
+ENTRYPOINT ["python"]
+CMD ["booth_metadata.py"]

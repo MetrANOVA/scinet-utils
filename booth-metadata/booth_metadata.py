@@ -55,16 +55,20 @@ class BoothMetadataCLI:
         for prefix in prefixes:
             tenant_id = prefix.get("tenant", {}).get("id", None)
             if tenant_id is None or prefix.get("prefix", None) is None:
+                print(f"Warning: Missing tenant_id or prefix for prefix {prefix.get('id', 'unknown')}", file=sys.stderr)
                 continue
             temp_dict[tenant_id]["addresses"].append(prefix["prefix"])
             temp_dict[tenant_id]["org_name"] = tenant_map.get(tenant_id, None)
             temp_dict[tenant_id]["resource_name"] = location_map.get(tenant_id, None)
+            if temp_dict[tenant_id]["resource_name"] is None:
+                #self.logger.warning(f"Missing resource_name for tenant_id {tenant_id}")
+                continue
             booth_num = temp_dict[tenant_id]["resource_name"].split(" ")[1]
             temp_dict[tenant_id]["latitude"] = coords_dict.get(booth_num, {}).get('x', None)
             temp_dict[tenant_id]["longitude"] = coords_dict.get(booth_num, {}).get('y', None)
 
         # now load the intranet info if we have it
-        self.fetch_intranet_metadata(temp_dict, coords_dict)
+        #self.fetch_intranet_metadata(temp_dict, coords_dict)
 
         return list(temp_dict.values())
     
@@ -129,7 +133,7 @@ if __name__ == "__main__":
     api_url = args.url or os.environ.get("URL")
     api_token = args.api_token or os.environ.get("API_TOKEN")
     coords_file = args.coords_file or os.environ.get("COORDS_FILE")
-    output_file = args.output_file or os.environ.get("OUTPUT_FILE")
+    output_file = args.output_file or os.environ.get("BOOTH_OUTPUT_FILE")
 
     # Validate required parameters
     if not api_url:
