@@ -7,7 +7,7 @@ import traceback
 import yaml
 
 
-DEVICE_ROLES = ["Conference+Router", "SCN+Router"]
+DEVICE_ROLES = ["Conference+Router", "SCN+Router", "Conference+Switch", "DNOC+Switch", "Wireless+Switch", "Management+Edge+Switch", "Management+Distribution+Switch"]
 DEVICE_STATUS = "Active"
 
 
@@ -159,9 +159,6 @@ class DeviceMetadataCLI:
             role_obj = device.get("role") or {}
             role_label = role_obj.get("display") or role_obj.get("name") or None
 
-            # Loopback IPs (most important)
-            loopback_ips = self._resolve_loopback_ips(name)
-
             # Management IPs from primary_ip4/primary_ip6 (embedded at depth=1)
             management_ips = self._management_ips_from_device(device)
 
@@ -180,7 +177,7 @@ class DeviceMetadataCLI:
             entry = {
                 "id": name,
                 "type": "router",
-                "loopback_ip": loopback_ips if loopback_ips else None,
+                "loopback_ip": management_ips,
                 "management_ip": management_ips,
                 "hostname": hostname,
                 "location_name": loc_info["location_name"],
@@ -208,7 +205,12 @@ class DeviceMetadataCLI:
 
     def to_yaml(self, entries):
         doc = {"table": "meta_device", "data": entries}
-        return yaml.dump(doc, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+        class NoAliasDumper(yaml.Dumper):
+            def ignore_aliases(self, data):
+                return True
+
+        return yaml.dump(doc, Dumper=NoAliasDumper, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
 
 if __name__ == "__main__":

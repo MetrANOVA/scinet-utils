@@ -8,6 +8,7 @@ services:
     environment:
       OUTPUT_FILE: ""
       DEVICE_OUTPUT_FILE: ""
+      INTERFACE_OUTPUT_FILE: ""
     volumes:
       - ./data:/data
 
@@ -21,5 +22,33 @@ services:
     environment:
       OUTPUT_FILE: ""
       BOOTH_OUTPUT_FILE: ""
+      INTERFACE_OUTPUT_FILE: ""
     volumes:
       - ./data:/data
+
+  interface-metadata:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["interface_metadata.py"]
+    env_file:
+      - .env
+    environment:
+      OUTPUT_FILE: ""
+      BOOTH_OUTPUT_FILE: ""
+      DEVICE_OUTPUT_FILE: ""
+    volumes:
+      - ./data:/data
+
+  device-to-input:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["device_to_input.py"]
+    env_file:
+      - .env
+    environment:
+      FORCE: 1
+    volumes:
+      - ./data:/data
+      - ./conf:/etc/sc-utils

@@ -1,0 +1,348 @@
+import requests
+import logging
+import argparse
+import os
+import sys
+import re
+import traceback
+import yaml
+
+
+DEVICE_ROLES = ["Conference+Router", "SCN+Router"]
+DEVICE_STATUS = "Active"
+
+# Interface roles that represent external peerings (edge: true)
+EDGE_ROLES = {
+    "WAN Peering (L3)",
+    "WAN Transit (L2)",
+    "NRE Connection (L3)",
+    "NRE Connection (L2)",
+    "NRE Connection (L2 Multipoint)",
+    "Exhibitor Connection (L3)",
+}
+
+# Interface roles that are backbone/internal (edge: false)
+BACKBONE_ROLES = {
+    "Backbone",
+    "Backbone Downlink (L2)",
+    "Point-to-Point",
+    "DWDM",
+    "Optical",
+    "Peerlink",
+    "Loopback",
+    "Management",
+}
+
+
+def _iface_type(iface):
+    """Map Nautobot interface type/role to YAML type string."""
+    nautobot_type = (iface.get("type") or {}).get("value", "")
+    if nautobot_type == "lag":
+        return "lag"
+    if nautobot_type == "virtual":
+        return "service_l3vpn"
+    return "port"
+
+
+def _is_edge(iface):
+    """Return True if interface is an external peering (edge)."""
+    role_name = (iface.get("role") or {}).get("display", "")
+    if role_name in EDGE_ROLES:
+        return True
+    if role_name in BACKBONE_ROLES:
+        return False
+    # Default to False for unknown roles
+    return False
+
+
+def _extract_iface_from_ip_description(device_name, desc):
+    """Extract interface name from an IP description string.
+
+    Two formats:
+      1. "<device>:<iface>: IPv4/6 Connection: ..."  → extract <iface>
+      2. "<device> <iface>"                           → extract <iface>
+    """
+    if not desc:
+        return None
+    # Format 1: "Device: <device>:<iface>: IPv4/6 Connection: ..."
+    m = re.match(r"Device:\s*[^:]+:([^:]+):", desc)
+    if m:
+        return m.group(1).strip()
+    # Format 2: "<device> <iface>"
+    if desc.startswith(device_name + " "):
+        return desc[len(device_name) + 1:].strip()
+    return None
+
+
+class InterfaceMetadataCLI:
+    def __init__(self, api_url, api_token):
+        self.api_url = api_url.rstrip("/")
+        self.api_token = api_token
+        self.logger = logging.getLogger(__name__)
+        self.headers = {
+            "Authorization": f"Token {self.api_token}",
+            "Content-Type": "application/json",
+        }
+
+    def _get(self, path):
+        url = f"{self.api_url}{path}"
+        results = []
+        while url:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            data = response.json()
+            results.extend(data.get("results", []))
+            url = data.get("next")
+        return results
+
+    def _fetch_devices(self):
+        role_query = "&".join(f"role={r}" for r in DEVICE_ROLES)
+        return self._get(f"/api/dcim/devices/?{role_query}&status={DEVICE_STATUS}")
+
+    def _fetch_interfaces(self, device_name):
+        return self._get(f"/api/dcim/interfaces/?device={device_name}&depth=1")
+
+    def _fetch_ips_for_device(self, device_name):
+        """Fetch all IPs for a device and return a dict keyed by interface name."""
+        all_ips = self._get(f"/api/ipam/ip-addresses/?device={device_name}")
+        iface_ips = {}
+        for ip in all_ips:
+            desc = ip.get("description", "") or ""
+            iface_name = _extract_iface_from_ip_description(device_name, desc)
+            if iface_name:
+                iface_ips.setdefault(iface_name, []).append(ip.get("address", ""))
+        return iface_ips
+
+    def _resolve_remote_interface_id(self, ce, iface_uuid_map):
+        """Given a connected_endpoint object, return 'device::iface' string.
+
+        Uses the local uuid map first. If the remote interface UUID is not in
+        the map (i.e., the remote device is not one of our target devices),
+        fetch the remote interface detail to get device name and interface name.
+        """
+        if not ce:
+            return None
+        ce_id = ce.get("id")
+        if not ce_id:
+            return None
+
+        # Try local map first (remote is one of our target devices)
+        if ce_id in iface_uuid_map:
+            return iface_uuid_map[ce_id]
+
+        # Remote is external — fetch the interface detail
+        try:
+            resp = requests.get(
+                f"{self.api_url}/api/dcim/interfaces/{ce_id}/?depth=1",
+                headers=self.headers,
+            )
+            resp.raise_for_status()
+            remote = resp.json()
+            remote_device_id = (remote.get("device") or {}).get("id")
+            remote_iface_name = remote.get("name", ce_id)
+
+            if remote_device_id:
+                # Fetch device name
+                dev_resp = requests.get(
+                    f"{self.api_url}/api/dcim/devices/{remote_device_id}/",
+                    headers=self.headers,
+                )
+                dev_resp.raise_for_status()
+                remote_dev_name = dev_resp.json().get("name", remote_device_id)
+                return f"{remote_dev_name}::{remote_iface_name}"
+        except Exception:
+            pass
+
+        return None
+
+    def fetch_metadata(self):
+        devices = self._fetch_devices()
+        device_names = [d["name"] for d in devices]
+
+        # Phase 1: collect all interfaces across all target devices, build uuid→id map
+        all_ifaces_by_device = {}  # device_name → list of interface dicts
+        iface_uuid_map = {}        # uuid → "device_name::iface_name"
+
+        for device_name in device_names:
+            self.logger.info("Fetching interfaces for %s", device_name)
+            ifaces = self._fetch_interfaces(device_name)
+            all_ifaces_by_device[device_name] = ifaces
+            for iface in ifaces:
+                uid = iface.get("id")
+                if uid:
+                    iface_uuid_map[uid] = f"{device_name}::{iface['name']}"
+
+        # Phase 2: build entries
+        entries = []
+        for device_name in device_names:
+            ifaces = all_ifaces_by_device[device_name]
+            iface_ips = self._fetch_ips_for_device(device_name)
+
+            # Build a name→uuid map for this device's interfaces (for lag member lookup)
+            name_to_uuid = {iface["name"]: iface["id"] for iface in ifaces}
+
+            for iface in ifaces:
+                iface_id_str = f"{device_name}::{iface['name']}"
+                iface_name = iface["name"]
+                iface_type = _iface_type(iface)
+                nautobot_type_val = (iface.get("type") or {}).get("value", "")
+                edge = _is_edge(iface)
+
+                # VRF
+                vrf_obj = iface.get("vrf") or {}
+                vrtr_name = vrf_obj.get("name") or None
+                vrtr_id = None
+                if vrf_obj:
+                    cf = vrf_obj.get("custom_fields") or {}
+                    vrtr_id = cf.get("numeric_id")
+                    if vrtr_id is not None:
+                        vrtr_id = str(vrtr_id)
+
+                # IPs from description-parsed map
+                raw_ips = iface_ips.get(iface_name, [])
+                ipv4_list = [a.split("/")[0] for a in raw_ips if ":" not in a]
+                ipv6_list = [a.split("/")[0] for a in raw_ips if ":" in a]
+
+                # Speed — None on LAGs; derive from member speeds if available
+                speed = iface.get("speed")
+                if speed is None and iface_type == "lag":
+                    # Count members whose uuid we know and try to get their speed
+                    member_speeds = []
+                    for candidate in ifaces:
+                        lag_ref = candidate.get("lag") or {}
+                        if lag_ref.get("id") == iface.get("id"):
+                            s = candidate.get("speed")
+                            if s:
+                                member_speeds.append(s)
+                    if member_speeds:
+                        # speed in Kbps → Mbps
+                        speed = sum(member_speeds) // 1000
+                if speed is not None and iface_type != "lag":
+                    # Convert Kbps to Mbps
+                    speed = speed // 1000
+
+                # remote_interface_id from connected_endpoint
+                ce = iface.get("connected_endpoint") or {}
+                remote_id = self._resolve_remote_interface_id(ce if ce else None, iface_uuid_map)
+
+                # port_interface_id — for virtual (sub-interfaces), the parent LAG/physical port
+                port_interface_id = None
+                parent_ref = iface.get("parent_interface") or {}
+                parent_uuid = parent_ref.get("id")
+                if parent_uuid and parent_uuid in iface_uuid_map:
+                    port_interface_id = iface_uuid_map[parent_uuid]
+                elif parent_uuid:
+                    # parent is an interface on this device (should always be in map)
+                    parent_name = next(
+                        (i["name"] for i in ifaces if i["id"] == parent_uuid), None
+                    )
+                    if parent_name:
+                        port_interface_id = f"{device_name}::{parent_name}"
+
+                # lag_member_interface_id — for LAG interfaces
+                lag_members = None
+                if iface_type == "lag":
+                    members = [
+                        iface_uuid_map[i["id"]]
+                        for i in ifaces
+                        if (i.get("lag") or {}).get("id") == iface.get("id")
+                        and i["id"] in iface_uuid_map
+                    ]
+                    if members:
+                        lag_members = members
+
+                entry = {
+                    "id": iface_id_str,
+                    "type": iface_type,
+                    "description": iface.get("description") or None,
+                    "device_id": device_name,
+                    "edge": edge,
+                    "name": iface_name,
+                }
+
+                if vrtr_name or vrtr_id:
+                    entry["ext"] = {}
+                    if vrtr_id:
+                        entry["ext"]["vrtr_id"] = vrtr_id
+                    if vrtr_name:
+                        entry["ext"]["vrtr_name"] = vrtr_name
+
+                if ipv4_list:
+                    entry["ipv4"] = ipv4_list[0] if len(ipv4_list) == 1 else ipv4_list
+                if ipv6_list:
+                    entry["ipv6"] = ipv6_list[0] if len(ipv6_list) == 1 else ipv6_list
+
+                if speed is not None:
+                    entry["speed"] = speed
+
+                if port_interface_id:
+                    entry["port_interface_id"] = port_interface_id
+
+                if remote_id:
+                    entry["remote_interface_id"] = remote_id
+
+                if lag_members:
+                    entry["lag_member_interface_id"] = lag_members
+
+                # Drop None values
+                entry = {k: v for k, v in entry.items() if v is not None}
+                entries.append(entry)
+
+        # Post-processing: any interface whose remote_interface_id is in our own
+        # output set is an internal link — override edge to False regardless of role.
+        known_ids = {e["id"] for e in entries}
+        for entry in entries:
+            remote = entry.get("remote_interface_id")
+            if remote and remote in known_ids:
+                entry["edge"] = False
+
+        return entries
+
+    def to_yaml(self, entries):
+        doc = {"table": "meta_interface", "data": entries}
+        return yaml.dump(doc, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Fetch router interface metadata from Nautobot and emit meta_interface YAML"
+    )
+    parser.add_argument("--url", help="Nautobot base URL (or set URL env var)")
+    parser.add_argument("--api-token", help="Nautobot API token (or set API_TOKEN env var)")
+    parser.add_argument("--output-file", help="Write YAML output to this file (default: stdout)")
+    args = parser.parse_args()
+
+    api_url = args.url or os.environ.get("URL")
+    api_token = args.api_token or os.environ.get("API_TOKEN")
+    output_file = args.output_file or os.environ.get("INTERFACE_OUTPUT_FILE")
+
+    if not api_url:
+        print("Error: --url is required (or set URL environment variable)", file=sys.stderr)
+        sys.exit(1)
+    if not api_token:
+        print("Error: --api-token is required (or set API_TOKEN environment variable)", file=sys.stderr)
+        sys.exit(1)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        stream=sys.stderr,
+    )
+
+    cli = InterfaceMetadataCLI(api_url, api_token)
+
+    try:
+        entries = cli.fetch_metadata()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        traceback.print_exc()
+        sys.exit(1)
+
+    yaml_output = cli.to_yaml(entries)
+
+    if output_file:
+        with open(output_file, "w") as f:
+            f.write(yaml_output)
+        print(f"Interface metadata written to {output_file}")
+    else:
+        print(yaml_output)
