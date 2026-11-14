@@ -16,7 +16,7 @@ PAGE_SIZE = 1000
 MAX_WORKERS = 10
 
 
-DEVICE_ROLES = ["Conference+Router", "SCN+Router"]
+DEVICE_ROLES = ["Conference+Router", "SCN+Router", "Conference+Switch", "DNOC+Switch", "Wireless+Switch", "Management+Edge+Switch", "Management+Distribution+Switch"]
 DEVICE_STATUS = "Active"
 
 # Interface roles that represent external peerings (edge: true)
