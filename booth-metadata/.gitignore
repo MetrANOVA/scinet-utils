@@ -10,3 +10,4 @@ __pycache__/
 .vscode/
 .env*
 data/*.json
+data/telegraf.d/*.conf

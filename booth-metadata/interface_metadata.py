@@ -6,6 +6,14 @@ import sys
 import re
 import traceback
 import yaml
+from datetime import datetime, timedelta, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+PAGE_SIZE = 1000
+MAX_WORKERS = 10
 
 
 DEVICE_ROLES = ["Conference+Router", "SCN+Router"]
@@ -74,6 +82,54 @@ def _extract_iface_from_ip_description(device_name, desc):
     return None
 
 
+def fetch_flow_index_map(ch_url, ch_username, ch_password, ch_database, lookback_hours=24):
+    """Query ClickHouse for ifName SNMP data and return a (device_id, if_name) → if_index dict."""
+    now = datetime.now(timezone.utc)
+    time_from = (now - timedelta(hours=lookback_hours)).strftime("%Y-%m-%d %H:%M:%S")
+    time_to = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    query = f"""
+SELECT
+    id,
+    argMax(ext.metric_value, observation_time) AS if_name,
+    argMax(ext.oidIndex, observation_time) AS if_index,
+    max(observation_time) AS update_time
+FROM data_snmp_counter
+WHERE metric_name = 'SNMP_IF-MIB::ifName'
+  AND observation_time >= '{time_from}'
+  AND observation_time <= '{time_to}'
+GROUP BY id, ext.metric_value, ext.oidIndex
+ORDER BY id, if_name, if_index
+SETTINGS allow_suspicious_types_in_order_by = 1, allow_suspicious_types_in_group_by = 1
+FORMAT JSONEachRow
+"""
+
+    response = requests.post(
+        ch_url,
+        params={"database": ch_database},
+        data=query.encode(),
+        auth=(ch_username, ch_password),
+        headers={"Content-Type": "text/plain"},
+        timeout=60,
+        verify=False,
+    )
+    response.raise_for_status()
+
+    import json
+    flow_index_map = {}
+    for line in response.text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        row = json.loads(line)
+        device_id = row.get("id", "")
+        if_name = row.get("if_name", "")
+        if_index = row.get("if_index")
+        if device_id and if_name and if_index is not None:
+            flow_index_map[(device_id, if_name)] = if_index
+    return flow_index_map
+
+
 class InterfaceMetadataCLI:
     def __init__(self, api_url, api_token):
         self.api_url = api_url.rstrip("/")
@@ -85,7 +141,8 @@ class InterfaceMetadataCLI:
         }
 
     def _get(self, path):
-        url = f"{self.api_url}{path}"
+        sep = "&" if "?" in path else "?"
+        url = f"{self.api_url}{path}{sep}limit={PAGE_SIZE}"
         results = []
         while url:
             response = requests.get(url, headers=self.headers)
@@ -97,10 +154,10 @@ class InterfaceMetadataCLI:
 
     def _fetch_devices(self):
         role_query = "&".join(f"role={r}" for r in DEVICE_ROLES)
-        return self._get(f"/api/dcim/devices/?{role_query}&status={DEVICE_STATUS}")
+        return self._get(f"/api/dcim/devices/?{role_query}&status={DEVICE_STATUS}&depth=1")
 
-    def _fetch_interfaces(self, device_name):
-        return self._get(f"/api/dcim/interfaces/?device={device_name}&depth=1")
+    def _fetch_interfaces_for_device(self, device_name):
+        return device_name, self._get(f"/api/dcim/interfaces/?device={device_name}&depth=1")
 
     def _fetch_ips_for_device(self, device_name):
         """Fetch all IPs for a device and return a dict keyed by interface name."""
@@ -111,7 +168,10 @@ class InterfaceMetadataCLI:
             iface_name = _extract_iface_from_ip_description(device_name, desc)
             if iface_name:
                 iface_ips.setdefault(iface_name, []).append(ip.get("address", ""))
-        return iface_ips
+        return device_name, iface_ips
+
+    # Cache for remote interface lookups: uuid → "device::iface" (or None)
+    _remote_iface_cache: dict = {}
 
     def _resolve_remote_interface_id(self, ce, iface_uuid_map):
         """Given a connected_endpoint object, return 'device::iface' string.
@@ -119,6 +179,7 @@ class InterfaceMetadataCLI:
         Uses the local uuid map first. If the remote interface UUID is not in
         the map (i.e., the remote device is not one of our target devices),
         fetch the remote interface detail to get device name and interface name.
+        Results are cached so the same remote interface is only fetched once.
         """
         if not ce:
             return None
@@ -130,7 +191,12 @@ class InterfaceMetadataCLI:
         if ce_id in iface_uuid_map:
             return iface_uuid_map[ce_id]
 
-        # Remote is external — fetch the interface detail
+        # Check cache
+        if ce_id in self._remote_iface_cache:
+            return self._remote_iface_cache[ce_id]
+
+        # depth=1 returns device inline, avoiding a second request
+        result = None
         try:
             resp = requests.get(
                 f"{self.api_url}/api/dcim/interfaces/{ce_id}/?depth=1",
@@ -138,45 +204,60 @@ class InterfaceMetadataCLI:
             )
             resp.raise_for_status()
             remote = resp.json()
-            remote_device_id = (remote.get("device") or {}).get("id")
-            remote_iface_name = remote.get("name", ce_id)
-
-            if remote_device_id:
-                # Fetch device name
-                dev_resp = requests.get(
-                    f"{self.api_url}/api/dcim/devices/{remote_device_id}/",
-                    headers=self.headers,
-                )
-                dev_resp.raise_for_status()
-                remote_dev_name = dev_resp.json().get("name", remote_device_id)
-                return f"{remote_dev_name}::{remote_iface_name}"
+            remote_dev_name = (remote.get("device") or {}).get("name", "")
+            remote_iface_name = remote.get("name", "")
+            if remote_dev_name and remote_iface_name:
+                result = f"{remote_dev_name}::{remote_iface_name}"
         except Exception:
             pass
 
-        return None
+        self._remote_iface_cache[ce_id] = result
+        return result
 
-    def fetch_metadata(self):
+    def fetch_metadata(self, flow_index_map=None):
         devices = self._fetch_devices()
         device_names = [d["name"] for d in devices]
 
-        # Phase 1: collect all interfaces across all target devices, build uuid→id map
+        # Build device_name → hostname map (hostname = dns_name from primary_ip4/6)
+        device_hostname_map = {}
+        for d in devices:
+            hostname = None
+            for field in ("primary_ip4", "primary_ip6"):
+                dns = (d.get(field) or {}).get("dns_name")
+                if dns:
+                    hostname = dns
+                    break
+            if hostname:
+                device_hostname_map[d["name"]] = hostname
+
+        # Phase 1: fetch all interfaces in parallel, build uuid→id map
         all_ifaces_by_device = {}  # device_name → list of interface dicts
         iface_uuid_map = {}        # uuid → "device_name::iface_name"
 
-        for device_name in device_names:
-            self.logger.info("Fetching interfaces for %s", device_name)
-            ifaces = self._fetch_interfaces(device_name)
-            all_ifaces_by_device[device_name] = ifaces
-            for iface in ifaces:
-                uid = iface.get("id")
-                if uid:
-                    iface_uuid_map[uid] = f"{device_name}::{iface['name']}"
+        self.logger.info("Fetching interfaces for %d devices in parallel", len(device_names))
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+            futures = {pool.submit(self._fetch_interfaces_for_device, dn): dn for dn in device_names}
+            for future in as_completed(futures):
+                device_name, ifaces = future.result()
+                all_ifaces_by_device[device_name] = ifaces
+                for iface in ifaces:
+                    uid = iface.get("id")
+                    if uid:
+                        iface_uuid_map[uid] = f"{device_name}::{iface['name']}"
 
-        # Phase 2: build entries
+        # Phase 2: fetch all IPs in parallel, then build entries
+        self.logger.info("Fetching IPs for %d devices in parallel", len(device_names))
+        all_ips_by_device = {}
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+            futures = {pool.submit(self._fetch_ips_for_device, dn): dn for dn in device_names}
+            for future in as_completed(futures):
+                device_name, iface_ips = future.result()
+                all_ips_by_device[device_name] = iface_ips
+
         entries = []
         for device_name in device_names:
             ifaces = all_ifaces_by_device[device_name]
-            iface_ips = self._fetch_ips_for_device(device_name)
+            iface_ips = all_ips_by_device[device_name]
 
             # Build a name→uuid map for this device's interfaces (for lag member lookup)
             name_to_uuid = {iface["name"]: iface["id"] for iface in ifaces}
@@ -284,6 +365,12 @@ class InterfaceMetadataCLI:
                 if lag_members:
                     entry["lag_member_interface_id"] = lag_members
 
+                if flow_index_map:
+                    hostname = device_hostname_map.get(device_name)
+                    flow_index = flow_index_map.get((hostname, iface_name)) if hostname else None
+                    if flow_index is not None:
+                        entry["flow_index"] = flow_index
+
                 # Drop None values
                 entry = {k: v for k, v in entry.items() if v is not None}
                 entries.append(entry)
@@ -310,11 +397,19 @@ if __name__ == "__main__":
     parser.add_argument("--url", help="Nautobot base URL (or set URL env var)")
     parser.add_argument("--api-token", help="Nautobot API token (or set API_TOKEN env var)")
     parser.add_argument("--output-file", help="Write YAML output to this file (default: stdout)")
+    parser.add_argument("--ch-url", help="ClickHouse HTTP URL (or set CLICKHOUSE_URL env var)")
+    parser.add_argument("--ch-username", help="ClickHouse username (or set CLICKHOUSE_USERNAME env var)")
+    parser.add_argument("--ch-password", help="ClickHouse password (or set CLICKHOUSE_PASSWORD env var)")
+    parser.add_argument("--ch-database", help="ClickHouse database (or set CLICKHOUSE_DATABASE env var)", default="metranova")
     args = parser.parse_args()
 
     api_url = args.url or os.environ.get("URL")
     api_token = args.api_token or os.environ.get("API_TOKEN")
     output_file = args.output_file or os.environ.get("INTERFACE_OUTPUT_FILE")
+    ch_url = args.ch_url or os.environ.get("CLICKHOUSE_URL")
+    ch_username = args.ch_username or os.environ.get("CLICKHOUSE_USERNAME")
+    ch_password = args.ch_password or os.environ.get("CLICKHOUSE_PASSWORD")
+    ch_database = args.ch_database or os.environ.get("CLICKHOUSE_DATABASE", "metranova")
 
     if not api_url:
         print("Error: --url is required (or set URL environment variable)", file=sys.stderr)
@@ -329,10 +424,20 @@ if __name__ == "__main__":
         stream=sys.stderr,
     )
 
+    logger = logging.getLogger(__name__)
     cli = InterfaceMetadataCLI(api_url, api_token)
 
+    flow_index_map = None
+    if ch_url and ch_username and ch_password:
+        try:
+            logger.info("Fetching flow index data from ClickHouse")
+            flow_index_map = fetch_flow_index_map(ch_url, ch_username, ch_password, ch_database)
+            logger.info("Loaded %d flow index entries from ClickHouse", len(flow_index_map))
+        except Exception as e:
+            logger.warning("Failed to fetch flow index from ClickHouse: %s", e)
+
     try:
-        entries = cli.fetch_metadata()
+        entries = cli.fetch_metadata(flow_index_map=flow_index_map)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         traceback.print_exc()
