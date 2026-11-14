@@ -11,3 +11,7 @@ __pycache__/
 .env*
 data/*.json
 data/telegraf.d/*.conf
+data/*.csv
+data/*.yml
+data/*.md
+data/*.svg
