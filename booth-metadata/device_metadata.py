@@ -7,7 +7,7 @@ import traceback
 import yaml
 
 
-DEVICE_ROLES = ["Conference+Router", "SCN+Router", "Conference+Switch", "DNOC+Switch", "Wireless+Switch", "Management+Edge+Switch", "Management+Distribution+Switch"]
+DEVICE_ROLES = ["Conference+Router", "SCN+Router", "SCN+Switch", "Conference+Switch", "DNOC+Switch", "Wireless+Switch", "Management+Edge+Switch", "Management+Distribution+Switch"]
 DEVICE_STATUS = "Active"
 
 
