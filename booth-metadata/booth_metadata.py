@@ -36,20 +36,21 @@ class BoothMetadataCLI:
     def fetch_metadata(self):
         # import csv of coordinates and create dict
         coords_dict = {}
-        with open(self.coords_file) as csvfile: 
-            coords = csv.reader(csvfile)
-            for row in coords:
-                coords_dict[row[0]] = {'x': row[1], 'y': row[2]}
+        with open(self.coords_file, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                tenant_name = row["name"].strip()
+                coords_dict[tenant_name] = {
+                    "booth": row["booth"].strip(),
+                    "x": row["x"].strip(),
+                    "y": row["y"].strip(),
+                }
         #first fetch the list of prefixes where tenant group is Exhibitor
         prefixes = self._fetch_url_with_pagination(f"{self.api_url}/api/ipam/prefixes/?tenant_group=Exhibitor")
         #then fetch the list of tenants where tenant group is Exhibitor
         tenants = self._fetch_url_with_pagination(f"{self.api_url}/api/tenancy/tenants/?tenant_group=Exhibitor")
-        # now get the list of locations
-        locations = self._fetch_url_with_pagination(f"{self.api_url}/api/dcim/locations/?tenant_group=Exhibitor")
-        # build a map of tenants to tenant name
+        # build a map of tenant_id -> tenant_name
         tenant_map = {tenant["id"]: tenant["name"] for tenant in tenants}
-        # build a map of location tenant ids to location name
-        location_map = {location["tenant"]["id"]: location["name"] for location in locations if location.get("tenant", {}).get("id", None) is not None}
         # build temp dict to join prefixes
         temp_dict = defaultdict(lambda: {"addresses": [], "org_name": None, "resource_name": None, "latitude": None, "longitude": None})
         for prefix in prefixes:
@@ -58,14 +59,16 @@ class BoothMetadataCLI:
                 print(f"Warning: Missing tenant_id or prefix for prefix {prefix.get('id', 'unknown')}", file=sys.stderr)
                 continue
             temp_dict[tenant_id]["addresses"].append(prefix["prefix"])
-            temp_dict[tenant_id]["org_name"] = tenant_map.get(tenant_id, None)
-            temp_dict[tenant_id]["resource_name"] = location_map.get(tenant_id, None)
-            if temp_dict[tenant_id]["resource_name"] is None:
-                #self.logger.warning(f"Missing resource_name for tenant_id {tenant_id}")
-                continue
-            booth_num = temp_dict[tenant_id]["resource_name"].split(" ")[1]
-            temp_dict[tenant_id]["latitude"] = coords_dict.get(booth_num, {}).get('x', None)
-            temp_dict[tenant_id]["longitude"] = coords_dict.get(booth_num, {}).get('y', None)
+            org_name = tenant_map.get(tenant_id)
+            temp_dict[tenant_id]["org_name"] = org_name
+            # Look up booth info from CSV by tenant/org name
+            coords = coords_dict.get(org_name) if org_name else None
+            if coords:
+                temp_dict[tenant_id]["resource_name"] = f"Booth {coords['booth']}"
+                temp_dict[tenant_id]["latitude"] = coords["x"]
+                temp_dict[tenant_id]["longitude"] = coords["y"]
+            else:
+                self.logger.warning("No CSV booth entry for tenant '%s' (id: %s)", org_name, tenant_id)
 
         # now load the intranet info if we have it
         #self.fetch_intranet_metadata(temp_dict, coords_dict)
