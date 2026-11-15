@@ -82,6 +82,59 @@ def _extract_iface_from_ip_description(device_name, desc):
     return None
 
 
+def _ch_query(ch_url, ch_username, ch_password, ch_database, query):
+    """Run a ClickHouse query and return parsed JSONEachRow rows."""
+    import json
+    response = requests.post(
+        ch_url,
+        params={"database": ch_database},
+        data=query.encode(),
+        auth=(ch_username, ch_password),
+        headers={"Content-Type": "text/plain"},
+        timeout=60,
+        verify=False,
+    )
+    response.raise_for_status()
+    rows = []
+    for line in response.text.splitlines():
+        line = line.strip()
+        if line:
+            rows.append(json.loads(line))
+    return rows
+
+
+def fetch_ifalias_map(ch_url, ch_username, ch_password, ch_database, lookback_hours=24):
+    """Query ClickHouse for ifAlias and return a (device_id, if_index) → if_alias dict.
+
+    Keyed by (device_id, oid_index) so it can be joined with the ifName map.
+    """
+    now = datetime.now(timezone.utc)
+    time_from = (now - timedelta(hours=lookback_hours)).strftime("%Y-%m-%d %H:%M:%S")
+    time_to = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    query = f"""
+SELECT
+    id,
+    argMax(ext.oidIndex, observation_time) AS if_index,
+    argMax(ext.metric_value, observation_time) AS if_alias
+FROM data_snmp_counter
+WHERE metric_name = 'SNMP_IF-MIB::ifAlias'
+  AND observation_time >= '{time_from}'
+  AND observation_time <= '{time_to}'
+GROUP BY id, ext.oidIndex
+SETTINGS allow_suspicious_types_in_group_by = 1
+FORMAT JSONEachRow
+"""
+    descr_map = {}
+    for row in _ch_query(ch_url, ch_username, ch_password, ch_database, query):
+        device_id = row.get("id", "")
+        if_index = row.get("if_index")
+        if_alias = row.get("if_alias") or None
+        if device_id and if_index is not None:
+            descr_map[(device_id, if_index)] = if_alias
+    return descr_map
+
+
 def fetch_flow_index_map(ch_url, ch_username, ch_password, ch_database, lookback_hours=24):
     """Query ClickHouse for ifName SNMP data and return a (device_id, if_name) → if_index dict."""
     now = datetime.now(timezone.utc)
@@ -104,24 +157,9 @@ SETTINGS allow_suspicious_types_in_order_by = 1, allow_suspicious_types_in_group
 FORMAT JSONEachRow
 """
 
-    response = requests.post(
-        ch_url,
-        params={"database": ch_database},
-        data=query.encode(),
-        auth=(ch_username, ch_password),
-        headers={"Content-Type": "text/plain"},
-        timeout=60,
-        verify=False,
-    )
-    response.raise_for_status()
-
-    import json
+    rows = _ch_query(ch_url, ch_username, ch_password, ch_database, query)
     flow_index_map = {}
-    for line in response.text.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        row = json.loads(line)
+    for row in rows:
         device_id = row.get("id", "")
         if_name = row.get("if_name", "")
         if_index = row.get("if_index")
@@ -214,7 +252,7 @@ class InterfaceMetadataCLI:
         self._remote_iface_cache[ce_id] = result
         return result
 
-    def fetch_metadata(self, flow_index_map=None):
+    def fetch_metadata(self, flow_index_map=None, ifalias_map=None):
         devices = self._fetch_devices()
         device_names = [d["name"] for d in devices]
 
@@ -383,6 +421,56 @@ class InterfaceMetadataCLI:
             if remote and remote in known_ids:
                 entry["edge"] = False
 
+        # Append synthetic entries for CH-only interfaces (not in Nautobot)
+        if flow_index_map:
+            entries = self.add_ch_only_entries(entries, flow_index_map, ifalias_map, device_hostname_map)
+
+        return entries
+
+    def add_ch_only_entries(self, entries, flow_index_map, ifalias_map, device_hostname_map):
+        """Append synthetic entries for CH interfaces not present in Nautobot."""
+        # Build reverse map: hostname → device_name
+        hostname_to_device = {v: k for k, v in device_hostname_map.items()}
+
+        known_ids = {e["id"] for e in entries}
+        added = 0
+        for (hostname, if_name), if_index in flow_index_map.items():
+            device_name = hostname_to_device.get(hostname)
+            if not device_name:
+                continue
+            iface_id_str = f"{device_name}::{if_name}"
+            if iface_id_str in known_ids:
+                continue
+
+            # Derive port_interface_id for sub-interface names like "ae0.1020" or "et-0/0/0.100"
+            port_interface_id = None
+            m = re.match(r"^(.+?)[./](\d+)$", if_name)
+            if m:
+                port_name = m.group(1)
+                port_interface_id = f"{device_name}::{port_name}"
+
+            entry = {
+                "id": iface_id_str,
+                "type": "port",
+                "device_id": device_name,
+                "edge": False,
+                "name": if_name,
+                "flow_index": if_index,
+            }
+
+            # Join ifAlias by (hostname, if_index) since that's what the descr map is keyed on
+            if_alias = ifalias_map.get((hostname, if_index)) if ifalias_map else None
+            if if_alias:
+                entry["description"] = if_alias
+
+            if port_interface_id:
+                entry["port_interface_id"] = port_interface_id
+
+            entries.append(entry)
+            known_ids.add(iface_id_str)
+            added += 1
+
+        self.logger.info("Added %d synthetic entries from ClickHouse not in Nautobot", added)
         return entries
 
     def to_yaml(self, entries):
@@ -428,6 +516,7 @@ if __name__ == "__main__":
     cli = InterfaceMetadataCLI(api_url, api_token)
 
     flow_index_map = None
+    ifalias_map = None
     if ch_url and ch_username and ch_password:
         try:
             logger.info("Fetching flow index data from ClickHouse")
@@ -435,9 +524,15 @@ if __name__ == "__main__":
             logger.info("Loaded %d flow index entries from ClickHouse", len(flow_index_map))
         except Exception as e:
             logger.warning("Failed to fetch flow index from ClickHouse: %s", e)
+        try:
+            logger.info("Fetching ifAlias data from ClickHouse")
+            ifalias_map = fetch_ifalias_map(ch_url, ch_username, ch_password, ch_database)
+            logger.info("Loaded %d ifAlias entries from ClickHouse", len(ifalias_map))
+        except Exception as e:
+            logger.warning("Failed to fetch ifAlias from ClickHouse: %s", e)
 
     try:
-        entries = cli.fetch_metadata(flow_index_map=flow_index_map)
+        entries = cli.fetch_metadata(flow_index_map=flow_index_map, ifalias_map=ifalias_map)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         traceback.print_exc()
