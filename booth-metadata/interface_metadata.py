@@ -98,8 +98,11 @@ def _ch_query(ch_url, ch_username, ch_password, ch_database, query):
     rows = []
     for line in response.text.splitlines():
         line = line.strip()
-        if line:
-            rows.append(json.loads(line))
+        if not line:
+            continue
+        # ClickHouse sometimes escapes '/' as '\/' in JSON output — unescape it
+        line = line.replace("\\/", "/")
+        rows.append(json.loads(line))
     return rows
 
 
@@ -404,8 +407,7 @@ class InterfaceMetadataCLI:
                     entry["lag_member_interface_id"] = lag_members
 
                 if flow_index_map:
-                    hostname = device_hostname_map.get(device_name)
-                    flow_index = flow_index_map.get((hostname, iface_name)) if hostname else None
+                    flow_index = flow_index_map.get((device_name, iface_name))
                     if flow_index is not None:
                         entry["flow_index"] = flow_index
 
@@ -429,14 +431,13 @@ class InterfaceMetadataCLI:
 
     def add_ch_only_entries(self, entries, flow_index_map, ifalias_map, device_hostname_map):
         """Append synthetic entries for CH interfaces not present in Nautobot."""
-        # Build reverse map: hostname → device_name
-        hostname_to_device = {v: k for k, v in device_hostname_map.items()}
-
         known_ids = {e["id"] for e in entries}
+        # Build set of known device names for filtering
+        known_devices = {e["device_id"] for e in entries}
+
         added = 0
-        for (hostname, if_name), if_index in flow_index_map.items():
-            device_name = hostname_to_device.get(hostname)
-            if not device_name:
+        for (device_name, if_name), if_index in flow_index_map.items():
+            if device_name not in known_devices:
                 continue
             iface_id_str = f"{device_name}::{if_name}"
             if iface_id_str in known_ids:
@@ -458,8 +459,8 @@ class InterfaceMetadataCLI:
                 "flow_index": if_index,
             }
 
-            # Join ifAlias by (hostname, if_index) since that's what the descr map is keyed on
-            if_alias = ifalias_map.get((hostname, if_index)) if ifalias_map else None
+            # Join ifAlias by (device_name, if_index)
+            if_alias = ifalias_map.get((device_name, if_index)) if ifalias_map else None
             if if_alias:
                 entry["description"] = if_alias
 
