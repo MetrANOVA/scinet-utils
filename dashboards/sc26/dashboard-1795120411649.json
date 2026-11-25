@@ -1,0 +1,670 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "addzqf4",
+    "generation": 13,
+    "creationTimestamp": "2026-11-12T17:51:31Z",
+    "labels": {},
+    "annotations": {}
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "spec": {},
+            "labels": {
+              "grafana.app/export-label": "grafana-1"
+            }
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "id": 3,
+          "title": "Traffic Rate",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "columns": [],
+                          "database": "metranova",
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "metranova",
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT $__timeInterval(start_time) as time, SUM(bit_count)/$__interval_s AS rate \nFROM data_flow \nWHERE $__timeFilter(time) AND device_ref IS NOT NULL\nGROUP BY time ORDER BY time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "1m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#3890d6"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 100,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "B outgoing"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>How fast is data moving over SCinet?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n  .edge, .none.node-SC {\n  display: none;\n  }\n  body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "Booths with the most Outgoing Traffic (Layer 3 only)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "src_ip",
+                              "custom": false,
+                              "name": "src_ip",
+                              "type": "IPv6"
+                            },
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "src_ip",
+                                "custom": false,
+                                "name": "src_ip",
+                                "type": "IPv6"
+                              },
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.11.2",
+                        "queryType": "table",
+                        "rawSql": "SELECT Booth, Organization, max(rate)\nFROM (\n  SELECT \n    dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.src_ip_scinet_ref) AS Organization,\n  sum(bit_count)/($__interval_s) AS rate,\n  $__timeInterval(start_time) as time\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, time, Organization\n  ORDER BY rate DESC\n)\nGROUP BY Booth, Organization\nORDER BY max(rate) DESC\nLIMIT 100"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#fa8c2f"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "max(rate)"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Max Rate"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 125
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "Booths with the most Incoming Traffic (Layer 3 only)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "src_ip",
+                              "custom": false,
+                              "name": "src_ip",
+                              "type": "IPv6"
+                            },
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "src_ip",
+                                "custom": false,
+                                "name": "src_ip",
+                                "type": "IPv6"
+                              },
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.11.2",
+                        "queryType": "table",
+                        "rawSql": "SELECT Booth, Organization, max(rate)\nFROM (\n  SELECT \n    dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.dst_ip_scinet_ref) AS Organization,\n  sum(bit_count)/($__interval_s) AS rate,\n  $__timeInterval(start_time) as time\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, time, Organization\n  ORDER BY rate DESC\n)\nGROUP BY Booth, Organization\nORDER BY max(rate) DESC\nLIMIT 100"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#7aa154"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "max(rate)"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Max Rate"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 125
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 3,
+              "width": 23,
+              "height": 18,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 21,
+              "width": 11,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-7"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 21,
+              "width": 11,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "1m",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Traffic Overview (rate)",
+    "variables": []
+  }
+}

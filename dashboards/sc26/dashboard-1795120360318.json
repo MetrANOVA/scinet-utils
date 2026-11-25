@@ -1,0 +1,1692 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "adz7d4t",
+    "generation": 40,
+    "creationTimestamp": "2026-11-15T22:25:46Z",
+    "labels": {},
+    "annotations": {}
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "spec": {},
+            "labels": {
+              "grafana.app/export-label": "grafana-1"
+            }
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Tooltip",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "id": 1,
+          "title": "NRE Traffic - Outgoing",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-arst-2', 'scn-sw-cela-3'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%5438%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "CalTech Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cena-4::1'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Ciena Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/12'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "DOE Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n   sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN ['scn-rtr-noka-1::ethernet-1/31']\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NCHC Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cela-3'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cela-3::Eth6/1',\n    'scn-sw-cela-3::Eth6/5'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NII Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time) AND \n  interface_id IN ('scn-rtr-jnpr-2::et-0/0/20')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Research Hotel",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-cela-3', 'scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%3651%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Starlight Booth",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {}
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 50,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 3,
+                    "pointSize": 12,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate CalTech Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#fa8c2f",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CalTech Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Research Hotel"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Research Hotel Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Starlight Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff3694",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Starlight Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate DOE Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#3890d6",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "DOE Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NCHC Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-yellow",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NCHC Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NII Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#737373",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NII Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Ciena Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Ciena Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "A",
+                          "mode": "none"
+                        }
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>What does the Network Research Exhibition (NRE) Traffic look like?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n  body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "NRE Traffic - Incoming",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-arst-2', 'scn-sw-cela-3'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%5438%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "CalTech Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cena-4::1'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Ciena Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/12'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "DOE Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n   sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/31'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NCHC Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cela-3'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cela-3::Eth6/1',\n    'scn-sw-cela-3::Eth6/5'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NII Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time) AND \n  interface_id IN ('scn-rtr-jnpr-2::et-0/0/20')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Research Hotel",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-cela-3', 'scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%3651%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Starlight Booth",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {}
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 50,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 3,
+                    "pointSize": 12,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate CalTech Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#fa8c2f",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CalTech Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Research Hotel"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Research Hotel Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Starlight Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff3694",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Starlight Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate DOE Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#3890d6",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "DOE Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NCHC Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-yellow",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NCHC Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NII Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#737373",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NII Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Ciena Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Ciena Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "A",
+                          "mode": "none"
+                        }
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-arst-2', 'scn-sw-cela-3'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%5438%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "CalTech Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cena-4::1'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Ciena Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/12'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "DOE Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/31'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NCHC Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cela-3'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cela-3::Eth6/1',\n    'scn-sw-cela-3::Eth6/5'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NII Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time) AND \n  interface_id IN ('scn-rtr-jnpr-2::et-0/0/20')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Research Hotel",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-cela-3', 'scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%3651%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Starlight Booth",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {
+                      "alias": "Total In/Out Max",
+                      "mode": "reduceRow",
+                      "reduce": {
+                        "reducer": "sum"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "fields": "/^Total In/Out Max$/",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value_and_name",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate CalTech Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#fa8c2f",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CalTech Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Research Hotel"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Research Hotel Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Starlight Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff3694",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Starlight Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate DOE Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#3890d6",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "DOE Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NCHC Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-yellow",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NCHC Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate NII Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#737373",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "NII Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Rate Ciena Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Ciena Booth"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Total In/Out Max"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff69af",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 18,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 18,
+              "y": 0,
+              "width": 6,
+              "height": 5,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 5,
+              "width": 24,
+              "height": 8,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 13,
+              "width": 24,
+              "height": 8,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "1m",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "NRE traffic",
+    "variables": [],
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,883 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "adz4fg4",
+    "namespace": "default",
+    "uid": "a1087df7-eb43-4568-8eca-40c46844d575",
+    "resourceVersion": "1795007238353996",
+    "generation": 12,
+    "creationTimestamp": "2026-11-13T18:07:12Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "108458276302848"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:eg3eo7n4awfeob",
+      "grafana.app/folder": "fg4dxvfkx5340f",
+      "grafana.app/saved-from-ui": "Grafana v13.0.12 (fd417469e2)",
+      "grafana.app/updatedBy": "user:eg3eo7n4awfeob",
+      "grafana.app/updatedTimestamp": "2026-11-18T13:07:18Z",
+      "grafana.app/folderTitle": "Displays",
+      "grafana.app/folderUrl": "/dashboards/f/fg4dxvfkx5340f/displays"
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "spec": {}
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "id": 1,
+          "title": "Peering Traffic - Incoming",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-2'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('conf-rtr-jnpr-2::et-0/0/31')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "Arelion",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('scn-rtr-noka-1::ethernet-1/28')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "WiscNet",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-1', 'scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('conf-rtr-jnpr-1::et-0/0/33', 'conf-rtr-jnpr-1::et-0/0/35', 'scn-rtr-jnpr-2::et-0/0/28')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "Internet2",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/21',\n    'scn-rtr-noka-1::ethernet-1/23'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "ESnet",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n   sum(in_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'conf-rtr-jnpr-1::et-0/0/31'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "UIUC",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 50,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 3,
+                    "pointSize": 12,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "WiscNet Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#cec4bc",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Arelion Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "UIUC Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff3694",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "ESnet Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#3890d6",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Internet2 Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "Peering Traffic - Outgoing",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-2'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('conf-rtr-jnpr-2::et-0/0/31')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "Arelion",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('scn-rtr-noka-1::ethernet-1/28')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "WiscNet",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-1', 'scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND interface_id IN ('conf-rtr-jnpr-1::et-0/0/33', 'conf-rtr-jnpr-1::et-0/0/35', 'scn-rtr-jnpr-2::et-0/0/28')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "Internet2",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/21',\n    'scn-rtr-noka-1::ethernet-1/23'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "ESnet",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n   sum(out_bits_delta) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['conf-rtr-jnpr-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'conf-rtr-jnpr-1::et-0/0/31'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      }
+                    },
+                    "refId": "UIUC",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 50,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 3,
+                    "pointSize": 12,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "WiscNet Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#cec4bc",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Arelion Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "UIUC Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#ff3694",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "ESnet Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#3890d6",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Internet2 Rate"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "id": 3,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<div>\n<center>\n<h1>What Networks does SCinet connect with?</h1>\n</center>\n</div>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n    body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 2,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 2,
+              "width": 24,
+              "height": 9,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 11,
+              "width": 24,
+              "height": 9,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Peering Traffic",
+    "variables": [],
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    }
+  }
+}

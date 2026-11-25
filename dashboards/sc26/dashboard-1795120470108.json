@@ -1,0 +1,698 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "adpdwnb",
+    "namespace": "default",
+    "uid": "7e0ce358-4f0c-4564-98cd-0bc812ccf4aa",
+    "resourceVersion": "1795107471447019",
+    "generation": 12,
+    "creationTimestamp": "2026-11-12T17:51:44Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "4245779667783680"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:eg3eo7n4awfeob",
+      "grafana.app/folder": "fg4dxvfkx5340f",
+      "grafana.app/saved-from-ui": "Grafana v13.0.12 (fd417469e2)",
+      "grafana.app/updatedBy": "user:eg3eo7n4awfeob",
+      "grafana.app/updatedTimestamp": "2026-11-19T16:57:51Z",
+      "grafana.app/folderTitle": "Displays",
+      "grafana.app/folderUrl": "/dashboards/f/fg4dxvfkx5340f/displays"
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "spec": {}
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "Booths with the most Incoming Traffic (vol)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "src_ip",
+                              "custom": false,
+                              "name": "src_ip",
+                              "type": "IPv6"
+                            },
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "src_ip",
+                                "custom": false,
+                                "name": "src_ip",
+                                "type": "IPv6"
+                              },
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.11.2",
+                        "queryType": "table",
+                        "rawSql": "SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.dst_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#7aa154"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Total Volume"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#7aa154",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 125
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "Traffic Volume",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "builderOptions": {
+                          "columns": [],
+                          "database": "metranova",
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "metranova",
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\nSUM(bit_count)/8 AS Volume\nFROM\n  metranova.data_flow\nWHERE\n  $__timeFilter(time) AND device_ref IS NOT NULL\nGROUP BY\n  time\nORDER BY\n  time\n"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "1m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#3890d6"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 100,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "B outgoing"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.transform",
+                        "value": "negative-Y"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "Booths with the most Outgoing Traffic (vol)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "metranova-clickhouse"
+                      },
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "src_ip",
+                              "custom": false,
+                              "name": "src_ip",
+                              "type": "IPv6"
+                            },
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "src_ip",
+                                "custom": false,
+                                "name": "src_ip",
+                                "type": "IPv6"
+                              },
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.11.2",
+                        "queryType": "table",
+                        "rawSql": "SELECT \n    dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.src_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL\n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#fa8c2f"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Total Volume"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#fa8c2f",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 125
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>How MUCH data is moving over SCinet?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n  body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 3,
+              "width": 22,
+              "height": 19,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 22,
+              "width": 11,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 22,
+              "width": 11,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Traffic Overview (volume)",
+    "variables": []
+  }
+}

@@ -1,0 +1,1103 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "advh7bl",
+    "generation": 14,
+    "creationTimestamp": "2026-11-12T17:50:48Z",
+    "labels": {},
+    "annotations": {}
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "spec": {},
+            "labels": {
+              "grafana.app/export-label": "grafana-1"
+            }
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "id": 3,
+          "title": "Traffic Rate",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "columns": [],
+                          "database": "metranova",
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "metranova",
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  SUM(bit_count)/$__interval_s AS rate\nFROM\n  metranova.data_flow\nWHERE\n  $__timeFilter(time) AND device_ref IS NOT NULL\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "10m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "marcusolsson-hourly-heatmap-panel",
+            "version": "2.0.1",
+            "spec": {
+              "options": {
+                "from": "0",
+                "legendGradientQuality": "medium",
+                "regions": [],
+                "showCellBorder": false,
+                "showLegend": false,
+                "showTooltip": true,
+                "showValueIndicator": false,
+                "to": "0",
+                "valueFieldName": "rate"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "custom": {
+                    "calculation": "mean",
+                    "colorPalette": "interpolateBlues",
+                    "colorSpace": "rgb",
+                    "groupBy": 60,
+                    "invertPalette": true,
+                    "nullValueColor": "rgb(155, 155, 155)"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "B outgoing"
+                    },
+                    "properties": []
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>When is SCinet the busiest?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n  body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT min(rate)\nFROM (\nSELECT\n  $__timeInterval(start_time) AS time,\n  SUM(bit_count)/$__interval_s AS rate\nFROM\n  metranova.data_flow\nWHERE\n  $__timeFilter(time) AND device_id IS NOT NULL\nGROUP BY\n  time\nORDER BY\n  time\n)"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "MIN",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT max(rate)\nFROM (\nSELECT\n  $__timeInterval(start_time) AS time,\n  SUM(bit_count)/$__interval_s AS rate\nFROM\n  metranova.data_flow\nWHERE\n  $__timeFilter(time) AND device_id IS NOT NULL\nGROUP BY\n  time\nORDER BY\n  time\n)"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "MAX",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "30m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "canvas",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "inlineEditing": true,
+                "panZoom": false,
+                "root": {
+                  "background": {
+                    "color": {
+                      "fixed": "transparent"
+                    }
+                  },
+                  "border": {
+                    "color": {
+                      "fixed": "dark-green"
+                    }
+                  },
+                  "constraint": {
+                    "horizontal": "left",
+                    "vertical": "top"
+                  },
+                  "elements": [
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "#053884"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#ffffff"
+                        },
+                        "size": 20,
+                        "text": {
+                          "field": "min(rate)",
+                          "fixed": "",
+                          "mode": "field"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 1",
+                      "placement": {
+                        "height": 50,
+                        "left": 22,
+                        "rotation": 0,
+                        "top": 336,
+                        "width": 261.828125
+                      },
+                      "type": "metric-value"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "#e2edff"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "size": 20,
+                        "text": {
+                          "field": "max(rate)",
+                          "fixed": "",
+                          "mode": "field"
+                        },
+                        "valign": "middle"
+                      },
+                      "connections": [],
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 2",
+                      "placement": {
+                        "height": 50,
+                        "left": 1317,
+                        "rotation": 0,
+                        "top": 336,
+                        "width": 261.828125
+                      },
+                      "type": "metric-value"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "dark-blue"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 3",
+                      "placement": {
+                        "height": 50,
+                        "left": 269,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "light-blue"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 4",
+                      "placement": {
+                        "height": 50,
+                        "left": 793,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "blue"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 5",
+                      "placement": {
+                        "height": 50,
+                        "left": 531,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "super-light-blue"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 6",
+                      "placement": {
+                        "height": 50,
+                        "left": 1055,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "#053884"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 8",
+                      "placement": {
+                        "height": 50,
+                        "left": 7,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "transparent"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "rgb(204, 204, 220)"
+                        },
+                        "size": 20,
+                        "text": {
+                          "fixed": "less busy"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 7",
+                      "placement": {
+                        "height": 50,
+                        "left": 79,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 99.9921875
+                      },
+                      "type": "text"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "#e8f1ff"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#000000"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 9",
+                      "placement": {
+                        "height": 50,
+                        "left": 1317,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 261.828125
+                      },
+                      "type": "rectangle"
+                    },
+                    {
+                      "background": {
+                        "color": {
+                          "fixed": "transparent"
+                        }
+                      },
+                      "border": {
+                        "color": {
+                          "fixed": "dark-green"
+                        }
+                      },
+                      "config": {
+                        "align": "center",
+                        "color": {
+                          "fixed": "#383838"
+                        },
+                        "size": 20,
+                        "text": {
+                          "fixed": "more busy"
+                        },
+                        "valign": "middle"
+                      },
+                      "constraint": {
+                        "horizontal": "left",
+                        "vertical": "top"
+                      },
+                      "links": [],
+                      "name": "Element 10",
+                      "placement": {
+                        "height": 50,
+                        "left": 1359,
+                        "rotation": 0,
+                        "top": 14,
+                        "width": 153
+                      },
+                      "type": "text"
+                    }
+                  ],
+                  "name": "Element 1763325628159",
+                  "placement": {
+                    "height": 100,
+                    "left": 0,
+                    "rotation": 0,
+                    "top": 0,
+                    "width": 100
+                  },
+                  "type": "frame"
+                },
+                "showAdvancedTypes": true,
+                "tooltip": {
+                  "disableForOneClick": false,
+                  "mode": "single"
+                },
+                "zoomToContent": false
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "Traffic Rates Over Time (SNMP)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-arst-2', 'scn-sw-cela-3'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%5438%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "CalTech Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cena-4::1'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Ciena Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/12'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "DOE Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-noka-1'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-rtr-noka-1::ethernet-1/31'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NCHC Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  interface_id,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-cela-3'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  interface_id IN [\n    'scn-sw-cela-3::Eth6/1',\n    'scn-sw-cela-3::Eth6/5'\n  ]\n  AND $__timeFilter(observation_time)\nGROUP BY\n  interface_id,\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "NII Booth",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-rtr-jnpr-2'],\n    from = $__fromTime,\n    to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time) AND \n  interface_id IN ('scn-rtr-jnpr-2::et-0/0/20')\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Research Hotel",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(observation_time) AS time,\n  (sum(in_bits_delta) + sum(out_bits_delta)) / $__interval_s as Rate\nFROM\n  data_interface_traffic_view (\n    ids = ['scn-sw-arst-1', 'scn-sw-cela-3', 'scn-sw-cena-4'],\n    from\n      = $__fromTime,\n      to = $__toTime\n  )\nWHERE\n  $__timeFilter(observation_time)\n  AND observation_time != '2026-11-16 20:48:00'\n  AND observation_time != '2026-11-16 20:30:00'\n  AND interface_id IN (\n    SELECT\n      id\n    FROM\n      meta_interface\n    WHERE\n      flow_index IS NOT NULL\n      AND description LIKE '%3651%'\n    GROUP BY\n      id\n    ORDER BY\n      id\n  )\nGROUP BY\n  time\nORDER BY\n  time ASC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "Starlight Booth",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {
+                      "alias": "Total In/Out",
+                      "mode": "reduceRow",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "replaceFields": true
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "marcusolsson-hourly-heatmap-panel",
+            "version": "2.0.1",
+            "spec": {
+              "options": {
+                "from": "0",
+                "legendGradientQuality": "high",
+                "showCellBorder": false,
+                "showLegend": true,
+                "showTooltip": true,
+                "showValueIndicator": false,
+                "to": "0"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bps",
+                  "thresholds": {
+                    "mode": "percentage",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "#9b094e"
+                      },
+                      {
+                        "value": 10,
+                        "color": "#d90467"
+                      },
+                      {
+                        "value": 80,
+                        "color": "#ff3694"
+                      },
+                      {
+                        "value": 100,
+                        "color": "#6ED0E0"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "calculation": "mean",
+                    "colorPalette": "interpolateGnBu",
+                    "colorSpace": "rgb",
+                    "groupBy": 60,
+                    "invertPalette": true,
+                    "nullValueColor": "rgb(155, 155, 155)"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 3,
+              "width": 22,
+              "height": 16,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 19,
+              "width": 23,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 22,
+              "width": 24,
+              "height": 16,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-7"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-3d",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Rate Heatmaps",
+    "variables": []
+  }
+}

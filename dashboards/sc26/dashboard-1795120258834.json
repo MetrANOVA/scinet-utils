@@ -1,0 +1,1288 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "adltgs9",
+    "generation": 50,
+    "creationTimestamp": "2026-11-06T00:12:15Z",
+    "labels": {},
+    "annotations": {}
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "spec": {},
+            "labels": {
+              "grafana.app/export-label": "grafana-1"
+            }
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "Top Booths by Volume (Incoming)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.dst_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.dst_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL AND Booth != '' \n  AND device_id IN ['conf-rtr-jnpr-1','conf-rtr-jnpr-2']\n  AND Organization NOT IN ['dNOC']\n  AND $__timeFilter(start_time) \n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC\n  LIMIT 7"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 1
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#3890d6"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 200
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "Top Booths by Volume (Outgoing)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "  SELECT \n  dictGet('meta_ip_scinet_dict', 'id', ext.src_ip_scinet_ref) AS Booth,\n  dictGet('meta_ip_scinet_dict', 'organization_name', ext.src_ip_scinet_ref) AS Organization,\n  sum(bit_count)/8 AS Volume\n  FROM \"metranova\".\"data_flow\" \n  WHERE Booth IS NOT NULL \n  AND Booth != '' \n  AND Organization NOT IN ['dNOC'] \n  AND device_id IN ['conf-rtr-jnpr-1','conf-rtr-jnpr-2']\n  AND $__timeFilter(start_time) \n  GROUP BY Booth, Organization\n  ORDER BY Volume DESC\n  LIMIT 7"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#fa8c2f"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Booth"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 200
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>Which Exhibitor booths are using the most data?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n  .edge, .none.node-SC {\n  display: none;\n  }\n    body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  upper(dictGet (\n    'meta_ip_scinet_dict',\n    'id',\n    ext.dst_ip_scinet_ref\n  )) AS Booth,\n  sum(bit_count) / 8 AS in_Volume\nFROM\n   data_flow\nWHERE\n  Booth IS NOT NULL\n  AND Booth != ''\n  AND $__timeFilter(start_time)\n  AND device_id IN ['conf-rtr-jnpr-1','conf-rtr-jnpr-2']\nGROUP BY\n  Booth\nORDER BY\n  in_Volume DESC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "in",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  upper(dictGet (\n    'meta_ip_scinet_dict',\n    'id',\n    ext.src_ip_scinet_ref\n  )) AS Booth,\n  sum(bit_count) / 8 AS out_Volume\nFROM\n   data_flow\nWHERE\n  Booth IS NOT NULL\n  AND Booth != ''\n  AND $__timeFilter(start_time)\n  AND device_id = 'conf-rtr-jnpr-2'\nGROUP BY\n  Booth\nORDER BY\n  out_Volume DESC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "out",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "merge",
+                  "spec": {
+                    "options": {}
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {
+                      "alias": "total_vol",
+                      "mode": "reduceRow",
+                      "reduce": {
+                        "include": [
+                          "in_Volume",
+                          "out_Volume"
+                        ],
+                        "reducer": "sum"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {
+                "maxDataPoints": 1
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "esnet-networkmap-panel",
+            "version": "3.1.0",
+            "spec": {
+              "options": {
+                "background": "#EDEDED",
+                "configurationUrl": "https://terranova-staging.es.net/terranova/api/v1/public/output/map/WxSUzOM/",
+                "customEdgeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>\n      ${forward.from} → ${forward.to}\n      <br />\n      Rate: ${forward.dataPoint}\n    </strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <span>\n      ${reverse.from} → ${reverse.to}\n      <br />\n      Rate: ${reverse.dataPoint}\n    </span>\n  </div>\n",
+                "customNodeTooltip": "<div class=\"flow-tooltip\">\n    <strong>${name}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>In Volume: ${inValue}</strong>\n  </div>\n<div class=\"flow-tooltip\">\n    <strong>Out Volume: ${outValue}</strong>\n  </div>",
+                "enableCustomEdgeTooltip": false,
+                "enableCustomNodeTooltip": false,
+                "enableEdgeAnimation": false,
+                "enableEditing": true,
+                "enableNodeAnimation": false,
+                "enableScrolling": true,
+                "initialViewStrategy": "static",
+                "layerLimit": 2,
+                "layers": [
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "dstField": "Booth",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "inboundValueField": "in_Volume",
+                    "legend": true,
+                    "mapjson": "{\"edges\":[],\"nodes\":[]}",
+                    "name": "Layer 1",
+                    "nodeNameMatchField": "Booth",
+                    "nodeThresholds": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "#5f626b",
+                          "value": 0
+                        },
+                        {
+                          "color": "#801145",
+                          "value": 1000
+                        },
+                        {
+                          "color": "#bc2d70",
+                          "value": 10000000
+                        },
+                        {
+                          "color": "#ff3694",
+                          "value": 100000000
+                        },
+                        {
+                          "color": "#ff70b3",
+                          "value": 1000000000
+                        },
+                        {
+                          "color": "#7aa154",
+                          "value": 10000000000
+                        },
+                        {
+                          "color": "#adde7d",
+                          "value": 1000000000000
+                        }
+                      ]
+                    },
+                    "nodeValueField": "total_vol",
+                    "nodeWidth": 5,
+                    "outboundValueField": "out_Volume",
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "srcField": "Booth",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": true,
+                    "mapjson": "{\"edges\":[],\"nodes\":[]}",
+                    "name": "Layer 2",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": true,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 3",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 4",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 5",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 6",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 7",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 8",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 9",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 10",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 11",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 12",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 13",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 14",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 15",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 16",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 17",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 18",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 19",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 20",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  }
+                ],
+                "legendColumnLength": 3,
+                "legendDefaultBehavior": "visible",
+                "legendPosition": "bottomleft",
+                "showLegend": true,
+                "showSidebar": false,
+                "showViewControls": false,
+                "tileset": {
+                  "geographic": "arcgis"
+                },
+                "topologySource": "url",
+                "viewport": {
+                  "center": {
+                    "lat": 39,
+                    "lng": -98
+                  },
+                  "zoom": 5
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "#4b5157ad"
+                      },
+                      {
+                        "value": 1000,
+                        "color": "#801145"
+                      },
+                      {
+                        "value": 10000000,
+                        "color": "#bc2d70"
+                      },
+                      {
+                        "value": 100000000,
+                        "color": "#ff3694"
+                      },
+                      {
+                        "value": 1000000000,
+                        "color": "#ff70b3"
+                      },
+                      {
+                        "value": 10000000000,
+                        "color": "#7aa154"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "id": 8,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  upper(dictGet (\n    'meta_ip_scinet_dict',\n    'id',\n    ext.dst_ip_scinet_ref\n  )) AS Booth,\n  sum(bit_count) / 8 AS in_Volume\nFROM\n   data_flow\nWHERE\n  Booth IS NOT NULL\n  AND Booth != ''\n  AND $__timeFilter(start_time)\n  AND device_id IN ['conf-rtr-jnpr-1','conf-rtr-jnpr-2']\nGROUP BY\n  Booth\nORDER BY\n  in_Volume DESC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "in",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "builderOptions": {
+                          "aggregates": [],
+                          "columns": [
+                            {
+                              "alias": "bit_count",
+                              "custom": false,
+                              "name": "bit_count",
+                              "type": "UInt64"
+                            }
+                          ],
+                          "database": "metranova",
+                          "filters": [],
+                          "groupBy": [],
+                          "limit": 1000,
+                          "meta": {},
+                          "mode": "list",
+                          "orderBy": [],
+                          "queryType": "table",
+                          "table": "data_flow"
+                        },
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "aggregates": [],
+                            "columns": [
+                              {
+                                "alias": "bit_count",
+                                "custom": false,
+                                "name": "bit_count",
+                                "type": "UInt64"
+                              }
+                            ],
+                            "database": "metranova",
+                            "filters": [],
+                            "groupBy": [],
+                            "limit": 1000,
+                            "meta": {},
+                            "mode": "list",
+                            "orderBy": [],
+                            "queryType": "table",
+                            "table": "data_flow"
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  upper(dictGet (\n    'meta_ip_scinet_dict',\n    'id',\n    ext.src_ip_scinet_ref\n  )) AS Booth,\n  sum(bit_count) / 8 AS out_Volume\nFROM\n   data_flow\nWHERE\n  Booth IS NOT NULL\n  AND Booth != ''\n  AND $__timeFilter(start_time)\n  AND device_id = 'conf-rtr-jnpr-2'\nGROUP BY\n  Booth\nORDER BY\n  out_Volume DESC"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "out",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "merge",
+                  "spec": {
+                    "options": {}
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {
+                      "alias": "total_vol",
+                      "mode": "reduceRow",
+                      "reduce": {
+                        "include": [
+                          "in_Volume",
+                          "out_Volume"
+                        ],
+                        "reducer": "sum"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "calculateField",
+                  "spec": {
+                    "options": {
+                      "binary": {
+                        "left": {
+                          "matcher": {
+                            "id": "byName",
+                            "options": "total_vol"
+                          }
+                        },
+                        "operator": "/",
+                        "right": {
+                          "fixed": "10"
+                        }
+                      },
+                      "mode": "binary",
+                      "reduce": {
+                        "reducer": "sum"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {
+                "maxDataPoints": 1
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "total_vol"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "#4b5157ad"
+                      },
+                      {
+                        "value": 1000,
+                        "color": "#9a215a"
+                      },
+                      {
+                        "value": 1000000,
+                        "color": "#9a215a"
+                      },
+                      {
+                        "value": 1000000000,
+                        "color": "#e24e93"
+                      },
+                      {
+                        "value": 10000000000,
+                        "color": "#7aa154"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 22,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-7"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 3,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 3,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 13,
+              "width": 12,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 22,
+              "width": 12,
+              "height": 22,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-8"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Booth Map",
+    "variables": [],
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    }
+  }
+}

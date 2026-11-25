@@ -1,0 +1,1259 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "an928mh",
+    "generation": 24,
+    "creationTimestamp": "2026-11-15T22:05:25Z",
+    "labels": {},
+    "annotations": {}
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "spec": {}
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "id": 1,
+          "title": "SCinet Traffic",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n upper(replaceRegexpAll(a.Node, '-cr6.*$', '')) as Node,\n upper(replaceRegexpAll(a.OutboundSource, '-cr6.*$', '')) as Source,\n upper(replaceRegexpAll(a.OutboundDestination, '-cr6.*$', '')) as Destination,\n b.InboundVolume As InboundVolume,\n a.OutboundVolume AS OutboundVolume,\n a.OutboundVolume + b.InboundVolume AS TotalVolume\nFROM\n (\n   SELECT\n     data_flow.device_id AS Node,\n     data_flow.device_id AS OutboundSource,\n     remote_if.device_id AS OutboundDestination,\n     SUM(data_flow.bit_count) / 8 AS OutboundVolume\n   FROM\n     data_flow\n     INNER JOIN meta_interface AS local_if ON data_flow.out_interface_id = local_if.id\n     INNER JOIN meta_interface AS remote_if ON local_if.remote_interface_id = remote_if.id\n   WHERE\n     $__timeFilter(start_time) AND (src_as_id IN (401015,14031) OR dst_as_id IN (401015,14031))\n   GROUP BY\n     Node,\n     OutboundSource,\n     OutboundDestination\n ) AS a INNER JOIN (\n   SELECT\n     data_flow.device_id AS Node,\n     remote_if.device_id AS InboundSource,\n     data_flow.device_id AS InboundDestination,\n     SUM(data_flow.bit_count) / 8 AS InboundVolume\n   FROM\n     data_flow\n     INNER JOIN meta_interface AS local_if ON data_flow.in_interface_id = local_if.id\n     INNER JOIN meta_interface AS remote_if ON local_if.remote_interface_id = remote_if.id\n   WHERE\n     $__timeFilter(start_time) AND (src_as_id IN (401015,14031) OR dst_as_id IN (401015,14031))\n   GROUP BY\n     Node,\n     InboundSource,\n     InboundDestination\n ) AS b\nON\n a.Node = b.Node AND a.OutboundSource = b.InboundDestination AND a.OutboundDestination = b.InboundSource\n"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "ESnet MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "esnet-networkmap-panel",
+            "version": "3.1.0",
+            "spec": {
+              "options": {
+                "background": "#EDEDED",
+                "configurationUrl": "",
+                "customEdgeTooltip": "\n  <div class=\"flow-tooltip\">\n    <strong>\n      ${forward.from} → ${forward.to}\n      <br />\n      Rate: ${forward.dataPoint}\n    </strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <span>\n      ${reverse.from} → ${reverse.to}\n      <br />\n      Rate: ${reverse.dataPoint}\n    </span>\n  </div>\n",
+                "customNodeTooltip": "<div class=\"flow-tooltip\">\n    <strong>${meta.display_name}</strong>\n  </div>\n  <div class=\"flow-tooltip\">\n    <strong>Node Volume: ${inValue}</strong>\n  </div>",
+                "enableCustomEdgeTooltip": false,
+                "enableCustomNodeTooltip": false,
+                "enableEdgeAnimation": true,
+                "enableEditing": true,
+                "enableNodeAnimation": true,
+                "enableScrolling": true,
+                "initialViewStrategy": "static",
+                "layerLimit": 1,
+                "layers": [
+                  {
+                    "color": "#5c5c5c",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "dstField": "Destination",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "inboundValueField": "InboundVolume",
+                    "legend": true,
+                    "mapjson": "{\"name\":\"ESnet Layer 1: Core Circuits\",\"layer\":\"core\",\"pathLayout\":{\"type\":\"curveCardinal\",\"tension\":0.6},\"edges\":[{\"name\":\"ALBQ--DENV\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ALBQ\",\"DENV\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[37.23101014670153,-105.39125764326121],[39.745837985537946,-104.97950904071331]]},{\"name\":\"ALBQ--ELPA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ALBQ\",\"ELPA\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[33.42235098592937,-106.57094155903906],[31.75638997927308,-106.48972003720701]]},{\"name\":\"ALBQ--LANLTA03\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ALBQ\",\"LANLTA03\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[35.504449088025126,-106.59196015569566],[35.88999995961785,-106.31000004708767]]},{\"name\":\"ALBQ--SNLNM\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ALBQ\",\"SNLNM\"]}},\"coordinates\":[[35.08831199258566,-106.6521630808711],[35.07446764502674,-106.59340040758252],[35.06062329746783,-106.53463773429394]]},{\"name\":\"AMESHWH--AMESHWHB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"AMESHWH\",\"AMESHWHB\"]}},\"coordinates\":[[42.03027997165918,-93.64751005545259],[42.03027997165918,-93.64751005545259],[42.03027997165918,-93.64751005545259]]},{\"name\":\"AMESHWHB--CHIC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"AMESHWHB\",\"CHIC\"]}},\"coordinates\":[[42.03027997165918,-93.64751005545259],[41.63186741069748,-91.1500027075401],[41.8976419698447,-87.64339095912874]]},{\"name\":\"ANL221--ANL541B\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ANL221\",\"ANL541B\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.71133428579196,-87.98216921277344],[41.70705739874393,-87.98081737942994]]},{\"name\":\"ANL221--CHIC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ANL221\",\"CHIC\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.80662657134235,-87.81345600262284],[41.8976419698447,-87.64339095912874]]},{\"name\":\"ANL221--FNALFCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ANL221\",\"FNALFCC\"]}},\"coordinates\":[[41.71561117284,-87.98352104611695],[41.778538583312184,-88.11923503875732],[41.84146599378437,-88.2549490313977]]},{\"name\":\"ANL541B--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ANL541B\",\"EQXCH2\"]}},\"coordinates\":[[41.70705739874393,-87.98081737942994],[41.780353432986885,-87.79957980383188],[41.85364946722984,-87.61834222823381]]},{\"name\":\"ANL541B--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ANL541B\",\"STAR\"]}},\"coordinates\":[[41.70705739874393,-87.98081737942994],[41.80161654017866,-87.79907202813774],[41.896175681613386,-87.61732667684555]]},{\"name\":\"ATLA--CHAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ATLA\",\"CHAT\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[34.394636414945126,-84.84269389417022],[35.03056696616113,-85.29741704463959]]},{\"name\":\"ATLA--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ATLA\",\"HOUS\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[30.587761408242827,-89.27347007100883],[29.941775961779058,-95.41717607527971]]},{\"name\":\"ATLA--JLAB205\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ATLA\",\"JLAB205\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[35.21956506637938,-79.8794802692993],[37.04987303499561,-76.4932485357611]]},{\"name\":\"ATLA--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ATLA\",\"WASH\"]}},\"coordinates\":[[33.75870586372912,-84.38797074370086],[36.52257860686157,-78.59971742624154],[40.34605999477208,-74.61537002585828]]},{\"name\":\"BNL515--BNL515B\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BNL515\",\"BNL515B\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.86611157283187,-72.87094711326063],[40.86611157283187,-72.87094711326063]]},{\"name\":\"BNL515--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BNL515\",\"NEWY1118TH\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.803753775544465,-73.43710657674819],[40.74139597825706,-74.00326604023576]]},{\"name\":\"BNL515--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BNL515\",\"NEWY32AOA\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.79307164764032,-73.43773186672479],[40.720031722448766,-74.00451662018895]]},{\"name\":\"BNL515B--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BNL515B\",\"NEWY32AOA\"]}},\"coordinates\":[[40.86611157283187,-72.87094711326063],[40.60608578380197,-73.74315856955945],[40.34605999477208,-74.61537002585828]]},{\"name\":\"BOIS--INLEIL\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOIS\",\"INLEIL\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[43.452166611848554,-114.57703872523456],[43.492017827409775,-112.13897884783557]]},{\"name\":\"BOIS--PNNLISB2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOIS\",\"PNNLISB2\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[45.3559428764376,-117.6705608743468],[46.348853996023536,-119.27458606660366]]},{\"name\":\"BOIS--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOIS\",\"SALT\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[42.17525723003145,-115.40535935170196],[40.75628999155015,-111.95481603965163]]},{\"name\":\"BOIS--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOIS\",\"SEAT\"]}},\"coordinates\":[[44.00482996366918,-116.96587004698813],[45.61736501797996,-120.09433509501554],[47.66608735914163,-122.33437131506298]]},{\"name\":\"BOST--EQXAM3\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOST\",\"EQXAM3\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[52.4059436794929,-24.943299679485946],[52.3546756664291,4.959119316190481]]},{\"name\":\"BOST--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOST\",\"EQXCH2\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[42.448524171806284,-78.59971742624154],[41.85364946722984,-87.61834222823381]]},{\"name\":\"BOST--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"BOST\",\"NEWY1118TH\"]}},\"coordinates\":[[42.36747199203819,-71.08640103600919],[41.554433985147625,-72.54483353812248],[40.74139597825706,-74.00326604023576]]},{\"name\":\"CERN513--CERN773\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CERN513\",\"CERN773\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[46.24545119237155,6.0650004632771015],[46.255994914099574,6.055021891370416]]},{\"name\":\"CERN513--EQXAM3\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CERN513\",\"EQXAM3\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[49.425173692874424,6.245416972209427],[52.3546756664291,4.959119316190481]]},{\"name\":\"CERN513--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CERN513\",\"WASH\"]}},\"coordinates\":[[46.23490747064352,6.074979035183787],[42.01072777144423,-34.1077567051026],[40.34605999477208,-74.61537002585828]]},{\"name\":\"CERN773--EQXLD8\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CERN773\",\"EQXLD8\"]}},\"coordinates\":[[46.255994914099574,6.055021891370416],[48.649984054840566,1.9588161053887456],[51.49806946981698,-0.014360547065734863]]},{\"name\":\"CHAT--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHAT\",\"NASH\"]}},\"coordinates\":[[35.03056696616113,-85.29741704463959],[35.56643697666004,-86.02623404469341],[36.102306987158954,-86.75505104474723]]},{\"name\":\"CHAT--ORNL1064\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHAT\",\"ORNL1064\"]}},\"coordinates\":[[35.03056696616113,-85.29741704463959],[35.476662979926914,-84.81063952669501],[35.922758993692696,-84.32386200875044]]},{\"name\":\"CHIC--EQXCH2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"EQXCH2\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.87564571853727,-87.63086659368128],[41.85364946722984,-87.61834222823381]]},{\"name\":\"CHIC--FNALGCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"FNALGCC\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.87440838199109,-87.9432290699333],[41.85117479413748,-88.24306718073785]]},{\"name\":\"CHIC--FRIB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"FRIB\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[42.33011372554263,-86.09861697141999],[42.76258548124057,-84.55384298371123]]},{\"name\":\"CHIC--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"KANS\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[40.0597703991828,-91.01607855772217],[39.10085497889668,-94.5823800098151]]},{\"name\":\"CHIC--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"NASH\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[38.99997447850183,-87.19922100193799],[36.102306987158954,-86.75505104474723]]},{\"name\":\"CHIC--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"CHIC\",\"STAR\"]}},\"coordinates\":[[41.8976419698447,-87.64339095912874],[41.89690882572904,-87.63035881798714],[41.896175681613386,-87.61732667684555]]},{\"name\":\"DENV--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"DENV\",\"KANS\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.88985998329429,-100.25444249483573],[39.10085497889668,-94.5823800098151]]},{\"name\":\"DENV--LANLTA50\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"DENV\",\"LANLTA50\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[37.969584941525774,-105.98166418419333],[35.88999995961785,-106.31000004708767]]},{\"name\":\"DENV--NRELESIF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"DENV\",\"NRELESIF\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.743293973151594,-105.07404953241348],[39.74074996076524,-105.16859002411366]]},{\"name\":\"DENV--NRELRSF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"DENV\",\"NRELRSF\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[39.74300993140787,-105.07877487223595],[39.74018187727779,-105.1780407037586]]},{\"name\":\"DENV--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"DENV\",\"SALT\"]}},\"coordinates\":[[39.745837985537946,-104.97950904071331],[40.25106398854405,-108.46716254018247],[40.75628999155015,-111.95481603965163]]},{\"name\":\"ELPA--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ELPA\",\"HOUS\"]}},\"coordinates\":[[31.75638997927308,-106.48972003720701],[30.041639348095305,-101.51085999028318],[29.941775961779058,-95.41717607527971]]},{\"name\":\"ELPA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ELPA\",\"SAND\"]}},\"coordinates\":[[31.75638997927308,-106.48972003720701],[31.249711943450702,-112.153455245838],[32.809036988765,-117.13589804247022]]},{\"name\":\"EQXAM3--EQXLD8\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXAM3\",\"EQXLD8\"]}},\"coordinates\":[[52.3546756664291,4.959119316190481],[51.659824198715825,2.4343408157495405],[51.49806946981698,-0.014360547065734863]]},{\"name\":\"EQXCH2--EQXDC4\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXCH2\",\"EQXDC4\"]}},\"coordinates\":[[41.85364946722984,-87.61834222823381],[40.43499772902578,-82.53842464182526],[39.01634599082172,-77.4585070554167]]},{\"name\":\"EQXCH2--STAR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXCH2\",\"STAR\"]}},\"coordinates\":[[41.85364946722984,-87.61834222823381],[41.874912574421614,-87.61783445253968],[41.896175681613386,-87.61732667684555]]},{\"name\":\"EQXDA3--HOUS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDA3\",\"HOUS\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[31.371036318596452,-96.11944511532784],[29.941775961779058,-95.41717607527971]]},{\"name\":\"EQXDA3--KANS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDA3\",\"KANS\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[35.95057582715526,-95.70204708259553],[39.10085497889668,-94.5823800098151]]},{\"name\":\"EQXDA3--PANTEX\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDA3\",\"PANTEX\"]}},\"coordinates\":[[32.80029667541385,-96.82171415537596],[34.29407902890142,-98.9241180878914],[35.284741767682135,-101.5466432645917]]},{\"name\":\"EQXDC4--GERMANTOWN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDC4\",\"GERMANTOWN\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.07894501768422,-77.37318840129406],[39.14154404454673,-77.28786974717141]]},{\"name\":\"EQXDC4--JLAB12\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDC4\",\"JLAB12\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[38.064097516633524,-76.9758777955889],[37.11184904244533,-76.4932485357611]]},{\"name\":\"EQXDC4--NETLMGN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDC4\",\"NETLMGN\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.34031293960288,-78.71760101057589],[39.664279888384044,-79.97669496573508]]},{\"name\":\"EQXDC4--NETLPGH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDC4\",\"NETLPGH\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.67111453413963,-78.72238129377365],[40.32588307745755,-79.9862555321306]]},{\"name\":\"EQXDC4--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXDC4\",\"WASH\"]}},\"coordinates\":[[39.01634599082172,-77.4585070554167],[39.6812029927969,-76.0369385406375],[40.34605999477208,-74.61537002585828]]},{\"name\":\"EQXLD8--NEWY1118TH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXLD8\",\"NEWY1118TH\"]}},\"coordinates\":[[51.49806946981698,-0.014360547065734863],[48.552235209535645,-32.3339908291768],[40.74139597825706,-74.00326604023576]]},{\"name\":\"EQXLD8--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXLD8\",\"NEWY32AOA\"]}},\"coordinates\":[[51.49806946981698,-0.014360547065734863],[46.65897800444833,-33.36868759013353],[40.34605999477208,-74.61537002585828]]},{\"name\":\"EQXSV5--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXSV5\",\"LOSA\"]}},\"coordinates\":[[37.2417666669935,-121.78296698257327],[35.64539381302893,-120.02135701943189],[34.049020959064364,-118.25974705629051]]},{\"name\":\"EQXSV5--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"EQXSV5\",\"SUNN\"]}},\"coordinates\":[[37.2417666669935,-121.78296698257327],[37.30760582489893,-121.88539199531078],[37.37344498280436,-121.9878170080483]]},{\"name\":\"FNALFCC--FNALGCC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"FNALFCC\",\"FNALGCC\"]}},\"coordinates\":[[41.84146599378437,-88.2549490313977],[41.84632039396092,-88.24900810606778],[41.85117479413748,-88.24306718073785]]},{\"name\":\"FORRESTAL--GERMANTOWN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"FORRESTAL\",\"GERMANTOWN\"]}},\"coordinates\":[[38.88815668411553,-76.99202757328749],[39.014850364331124,-77.13994866022945],[39.14154404454673,-77.28786974717141]]},{\"name\":\"FORRESTAL--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"FORRESTAL\",\"WASH\"]}},\"coordinates\":[[38.88815668411553,-76.99202757328749],[39.6171083394438,-75.80369879957289],[40.34605999477208,-74.61537002585828]]},{\"name\":\"FRIB--FRIB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"FRIB\",\"FRIB\"]}},\"coordinates\":[[42.80309866662815,-84.58622695785051],[42.76258548124057,-84.55384298371123]]},{\"name\":\"GA--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"GA\",\"LOSA\"]}},\"coordinates\":[[32.89381956215948,-117.23594452254474],[33.47142026061192,-117.74784578941762],[34.049020959064364,-118.25974705629051]]},{\"name\":\"GA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"GA\",\"SAND\"]}},\"coordinates\":[[32.89381956215948,-117.23594452254474],[32.85142827546224,-117.18592128250748],[32.809036988765,-117.13589804247022]]},{\"name\":\"HOUS--NASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"HOUS\",\"NASH\"]}},\"coordinates\":[[29.941775961779058,-95.41717607527971],[33.37322780413478,-91.45952002670361],[36.102306987158954,-86.75505104474723]]},{\"name\":\"HOUS--PANTEX\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"HOUS\",\"PANTEX\"]}},\"coordinates\":[[29.941775961779058,-95.41717607527971],[32.222087618865956,-99.26957261092059],[35.284741767682135,-101.5466432645917]]},{\"name\":\"INLEIL--INLEROB\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"INLEIL\",\"INLEROB\"]}},\"coordinates\":[[43.492017827409775,-112.13897884783557],[43.62697455044247,-112.1697013495424],[43.76193127347516,-112.20042385124921]]},{\"name\":\"INLEROB--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"INLEROB\",\"SALT\"]}},\"coordinates\":[[43.51762999780476,-112.04925008118153],[42.136959994677454,-112.00203306041658],[40.75628999155015,-111.95481603965163]]},{\"name\":\"JLAB12--JLAB205\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"JLAB12\",\"JLAB205\"]}},\"coordinates\":[[37.11184904244533,-76.4932485357611],[37.08086103872047,-76.4932485357611],[37.04987303499561,-76.4932485357611]]},{\"name\":\"KANS--KCNSC\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"KANS\",\"KCNSC\"]}},\"coordinates\":[[39.10085497889668,-94.5823800098151],[39.10085497889668,-94.5823800098151],[39.10085497889668,-94.5823800098151]]},{\"name\":\"LANLTA03--LANLTA50\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LANLTA03\",\"LANLTA50\"]}},\"coordinates\":[[35.88999995961785,-106.31000004708767],[35.88999995961785,-106.31000004708767],[35.88999995961785,-106.31000004708767]]},{\"name\":\"LASV--LOSA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LASV\",\"LOSA\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[35.14303046045825,-116.68852904811502],[34.049020959064364,-118.25974705629051]]},{\"name\":\"LASV--NNSS\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LASV\",\"NNSS\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[36.222119461745024,-115.12674902100116],[36.207198961637914,-115.1361870020628]]},{\"name\":\"LASV--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LASV\",\"SALT\"]}},\"coordinates\":[[36.23703996185213,-115.11731103993952],[38.49666497670114,-113.53606353979558],[40.75628999155015,-111.95481603965163]]},{\"name\":\"LBNL50--LBNL59\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LBNL50\",\"LBNL59\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[37.87598446011543,-122.25001425482333],[37.87598446011543,-122.25001425482333]]},{\"name\":\"LBNL50--SACR\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LBNL50\",\"SACR\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[38.231370218563825,-121.89010015223175],[38.58675597701222,-121.53018604964018]]},{\"name\":\"LBNL59--SLAC50N\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LBNL59\",\"SLAC50N\"]}},\"coordinates\":[[37.87598446011543,-122.25001425482333],[37.65199865447357,-122.21368737984449],[37.42801284883171,-122.17736050486565]]},{\"name\":\"LLNL--SNLCA902\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LLNL\",\"SNLCA902\"]}},\"coordinates\":[[37.67975574976167,-121.70997287939964],[37.682040591647514,-121.70767977858601]]},{\"name\":\"LLNL--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LLNL\",\"SUNN\"]}},\"coordinates\":[[37.679794994182885,-121.7107670288533],[37.52661998849362,-121.8492920184508],[37.37344498280436,-121.9878170080483]]},{\"name\":\"LOSA--SAND\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LOSA\",\"SAND\"]}},\"coordinates\":[[34.049020959064364,-118.25974705629051],[33.42902897391468,-117.69782254938036],[32.809036988765,-117.13589804247022]]},{\"name\":\"LOSA--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"LOSA\",\"SUNN\"]}},\"coordinates\":[[34.049020959064364,-118.25974705629051],[35.204946391170324,-120.6527500679825],[37.37344498280436,-121.9878170080483]]},{\"name\":\"NASH--ORNL5600\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NASH\",\"ORNL5600\"]}},\"coordinates\":[[36.102306987158954,-86.75505104474723],[36.0157809779048,-85.5327330250293],[35.92925496865064,-84.31041500531137]]},{\"name\":\"NETLALB--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NETLALB\",\"SEAT\"]}},\"coordinates\":[[44.62018797174096,-123.12077715061605],[46.137332478538156,-122.72164550609887],[47.65447698533535,-122.32251386158168]]},{\"name\":\"NEWY1118TH--NEWY32AOA\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NEWY1118TH\",\"NEWY32AOA\"]}},\"coordinates\":[[40.74139597825706,-74.00326604023576],[40.54372798651457,-74.30931803304702],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NEWY32AOA--PPPL\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NEWY32AOA\",\"PPPL\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NEWY32AOA--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NEWY32AOA\",\"WASH\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"NRELESIF--NRELRSF\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"NRELESIF\",\"NRELRSF\"]}},\"coordinates\":[[39.74074996076524,-105.16859002411366],[39.74046591902152,-105.17331536393613],[39.74018187727779,-105.1780407037586]]},{\"name\":\"ORAU--ORNL1064\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORAU\",\"ORNL1064\"]}},\"coordinates\":[[36.04368026833981,-84.21039635315537],[35.983219631016254,-84.2671291809529],[35.922758993692696,-84.32386200875044]]},{\"name\":\"ORNL1064--ORNL5600\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORNL1064\",\"ORNL5600\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.92600698117167,-84.3171385070309],[35.92925496865064,-84.31041500531137]]},{\"name\":\"ORNL1064--OSTI\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORNL1064\",\"OSTI\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.983219631016254,-84.2671291809529],[36.04368026833981,-84.21039635315537]]},{\"name\":\"ORNL1064--Y12\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORNL1064\",\"Y12\"]}},\"coordinates\":[[35.922758993692696,-84.32386200875044],[35.959034487605095,-84.28075103089213],[35.995309981517494,-84.23764005303383]]},{\"name\":\"ORNL5600--OSTI\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORNL5600\",\"OSTI\"]}},\"coordinates\":[[35.92925496865064,-84.31041500531137],[35.986467618495226,-84.26040567923337],[36.04368026833981,-84.21039635315537]]},{\"name\":\"ORNL5600--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"ORNL5600\",\"WASH\"]}},\"coordinates\":[[35.92925496865064,-84.31041500531137],[38.13765748171136,-79.46289251558483],[40.34605999477208,-74.61537002585828]]},{\"name\":\"PNNLEMSL--PNNLISB2\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"PNNLEMSL\",\"PNNLISB2\"]}},\"coordinates\":[[46.3483049813658,-119.27836102433503],[46.34857948869467,-119.27647354546934],[46.348853996023536,-119.27458606660366]]},{\"name\":\"PNNLEMSL--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"PNNLEMSL\",\"SEAT\"]}},\"coordinates\":[[46.3483049813658,-119.27836102433503],[47.007196170253714,-120.806366169699],[47.66608735914163,-122.33437131506298]]},{\"name\":\"PPPL--WASH\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"PPPL\",\"WASH\"]}},\"coordinates\":[[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828],[40.34605999477208,-74.61537002585828]]},{\"name\":\"SACR--SALT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"SACR\",\"SALT\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[40.34201501730294,-116.80959067014325],[40.75628999155015,-111.95481603965163]]},{\"name\":\"SACR--SEAT\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"SACR\",\"SEAT\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[42.78659631207029,-121.30186102523152],[47.66608735914163,-122.33437131506298]]},{\"name\":\"SACR--SNLCA902\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"SACR\",\"SNLCA902\"]}},\"coordinates\":[[38.58675597701222,-121.53018604964018],[38.13327548559755,-121.62047653924674],[37.679794994182885,-121.7107670288533]]},{\"name\":\"SLAC50N--SLAC50S\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"SLAC50N\",\"SLAC50S\"]}},\"coordinates\":[[37.42801284883171,-122.17736050486565],[37.42801284883171,-122.17736050486565],[37.42801284883171,-122.17736050486565]]},{\"name\":\"SLAC50S--SUNN\",\"meta\":{\"capacity\":200000000000,\"endpoint_identifiers\":{\"names\":[\"SLAC50S\",\"SUNN\"]}},\"coordinates\":[[37.42801284883171,-122.17736050486565],[37.400728915818036,-122.08258875645697],[37.37344498280436,-121.9878170080483]]}],\"nodes\":[{\"name\":\"ALBQ\",\"meta\":{},\"coordinate\":[35.08831199258566,-106.6521630808711]},{\"name\":\"AMESHWH\",\"meta\":{},\"coordinate\":[42.03027997165918,-93.64751005545259]},{\"name\":\"AMESHWHB\",\"meta\":{},\"coordinate\":[42.03027997165918,-93.64751005545259]},{\"name\":\"ANL221\",\"meta\":{},\"coordinate\":[41.71561117284,-87.98352104611695]},{\"name\":\"ANL541B\",\"meta\":{},\"coordinate\":[41.70705739874393,-87.98081737942994]},{\"name\":\"ATLA\",\"meta\":{},\"coordinate\":[33.75870586372912,-84.38797074370086]},{\"name\":\"BNL515\",\"meta\":{},\"coordinate\":[40.86611157283187,-72.87094711326063]},{\"name\":\"BNL515B\",\"meta\":{},\"coordinate\":[40.86611157283187,-72.87094711326063]},{\"name\":\"BOIS\",\"meta\":{},\"coordinate\":[44.00482996366918,-116.96587004698813]},{\"name\":\"BOST\",\"meta\":{},\"coordinate\":[42.36747199203819,-71.08640103600919]},{\"name\":\"CERN513\",\"meta\":{},\"coordinate\":[46.23490747064352,6.074979035183787]},{\"name\":\"CERN773\",\"meta\":{},\"coordinate\":[46.255994914099574,6.055021891370416]},{\"name\":\"CHAT\",\"meta\":{},\"coordinate\":[35.03056696616113,-85.29741704463959]},{\"name\":\"CHIC\",\"meta\":{},\"coordinate\":[41.8976419698447,-87.64339095912874]},{\"name\":\"DENV\",\"meta\":{},\"coordinate\":[39.745837985537946,-104.97950904071331]},{\"name\":\"ELPA\",\"meta\":{},\"coordinate\":[31.75638997927308,-106.48972003720701]},{\"name\":\"EQXAM3\",\"meta\":{},\"coordinate\":[52.3546756664291,4.959119316190481]},{\"name\":\"EQXCH2\",\"meta\":{},\"coordinate\":[41.85364946722984,-87.61834222823381]},{\"name\":\"EQXDA3\",\"meta\":{},\"coordinate\":[32.80029667541385,-96.82171415537596]},{\"name\":\"EQXDC4\",\"meta\":{},\"coordinate\":[39.01634599082172,-77.4585070554167]},{\"name\":\"EQXLD8\",\"meta\":{},\"coordinate\":[51.49806946981698,-0.014360547065734863]},{\"name\":\"EQXSV5\",\"meta\":{},\"coordinate\":[37.2417666669935,-121.78296698257327]},{\"name\":\"FNALFCC\",\"meta\":{},\"coordinate\":[41.84146599378437,-88.2549490313977]},{\"name\":\"FNALGCC\",\"meta\":{},\"coordinate\":[41.85117479413748,-88.24306718073785]},{\"name\":\"FORRESTAL\",\"meta\":{},\"coordinate\":[38.88815668411553,-76.99202757328749]},{\"name\":\"FRIB\",\"meta\":{},\"coordinate\":[42.76258548124057,-84.55384298371123]},{\"name\":\"GA\",\"meta\":{},\"coordinate\":[32.89381956215948,-117.23594452254474]},{\"name\":\"GERMANTOWN\",\"meta\":{},\"coordinate\":[39.180948212742805,-77.25637586787343]},{\"name\":\"HOUS\",\"meta\":{},\"coordinate\":[29.941775961779058,-95.41717607527971]},{\"name\":\"INLEIL\",\"meta\":{},\"coordinate\":[43.492017827409775,-112.13897884783557]},{\"name\":\"INLEROB\",\"meta\":{},\"coordinate\":[43.76193127347516,-112.20042385124921]},{\"name\":\"JLAB12\",\"meta\":{},\"coordinate\":[37.11184904244533,-76.4932485357611]},{\"name\":\"JLAB205\",\"meta\":{},\"coordinate\":[37.04987303499561,-76.4932485357611]},{\"name\":\"KANS\",\"meta\":{},\"coordinate\":[39.10085497889668,-94.5823800098151]},{\"name\":\"KCNSC\",\"meta\":{},\"coordinate\":[38.862869990989566,-94.54657000489533]},{\"name\":\"LANLTA03\",\"meta\":{},\"coordinate\":[35.88999995961785,-106.31000004708767]},{\"name\":\"LANLTA50\",\"meta\":{},\"coordinate\":[35.88999995961785,-106.31000004708767]},{\"name\":\"LASV\",\"meta\":{},\"coordinate\":[36.23703996185213,-115.11731103993952]},{\"name\":\"LBNL50\",\"meta\":{},\"coordinate\":[37.87598446011543,-122.25001425482333]},{\"name\":\"LBNL59\",\"meta\":{},\"coordinate\":[37.87598446011543,-122.25001425482333]},{\"name\":\"LLNL\",\"meta\":{},\"coordinate\":[37.679794994182885,-121.7107670288533]},{\"name\":\"LOSA\",\"meta\":{},\"coordinate\":[34.049020959064364,-118.25974705629051]},{\"name\":\"NASH\",\"meta\":{},\"coordinate\":[36.102306987158954,-86.75505104474723]},{\"name\":\"NETLALB\",\"meta\":{},\"coordinate\":[44.62018797174096,-123.12077715061605]},{\"name\":\"NETLMGN\",\"meta\":{},\"coordinate\":[39.664279888384044,-79.97669496573508]},{\"name\":\"NETLPGH\",\"meta\":{},\"coordinate\":[40.32588307745755,-79.9862555321306]},{\"name\":\"NEWY1118TH\",\"meta\":{},\"coordinate\":[40.74139597825706,-74.00326604023576]},{\"name\":\"NEWY32AOA\",\"meta\":{},\"coordinate\":[40.720031722448766,-74.00451662018895]},{\"name\":\"NNSS\",\"meta\":{},\"coordinate\":[36.207198961637914,-115.1361870020628]},{\"name\":\"NRELESIF\",\"meta\":{},\"coordinate\":[39.74074996076524,-105.16859002411366]},{\"name\":\"NRELRSF\",\"meta\":{},\"coordinate\":[39.74018187727779,-105.1780407037586]},{\"name\":\"ORAU\",\"meta\":{},\"coordinate\":[36.04368026833981,-84.21039635315537]},{\"name\":\"ORNL1064\",\"meta\":{},\"coordinate\":[35.922758993692696,-84.32386200875044]},{\"name\":\"ORNL5600\",\"meta\":{},\"coordinate\":[35.92925496865064,-84.31041500531137]},{\"name\":\"OSTI\",\"meta\":{},\"coordinate\":[36.04368026833981,-84.21039635315537]},{\"name\":\"PANTEX\",\"meta\":{},\"coordinate\":[35.284741767682135,-101.5466432645917]},{\"name\":\"PNNLEMSL\",\"meta\":{},\"coordinate\":[46.3483049813658,-119.27836102433503]},{\"name\":\"PNNLISB2\",\"meta\":{},\"coordinate\":[46.348853996023536,-119.27458606660366]},{\"name\":\"PPPL\",\"meta\":{},\"coordinate\":[40.34605999477208,-74.61537002585828]},{\"name\":\"SACR\",\"meta\":{},\"coordinate\":[38.58675597701222,-121.53018604964018]},{\"name\":\"SALT\",\"meta\":{},\"coordinate\":[40.75628999155015,-111.95481603965163]},{\"name\":\"SAND\",\"meta\":{},\"coordinate\":[32.809036988765,-117.13589804247022]},{\"name\":\"SEAT\",\"meta\":{},\"coordinate\":[47.65447698533535,-122.32251386158168]},{\"name\":\"SLAC50N\",\"meta\":{},\"coordinate\":[37.42801284883171,-122.17736050486565]},{\"name\":\"SLAC50S\",\"meta\":{},\"coordinate\":[37.42801284883171,-122.17736050486565]},{\"name\":\"SNLCA902\",\"meta\":{},\"coordinate\":[37.682040591647514,-121.70767977858601]},{\"name\":\"SNLNM\",\"meta\":{},\"coordinate\":[35.06062329746783,-106.53463773429394]},{\"name\":\"STAR\",\"meta\":{},\"coordinate\":[41.896175681613386,-87.61732667684555]},{\"name\":\"SUNN\",\"meta\":{},\"coordinate\":[37.37344498280436,-121.9878170080483]},{\"name\":\"WASH\",\"meta\":{},\"coordinate\":[38.92004697583616,-77.21159806475043]},{\"name\":\"Y12\",\"meta\":{},\"coordinate\":[35.995309981517494,-84.23764005303383]}]}",
+                    "name": "Internet2 Routers",
+                    "nodeNameMatchField": "Node",
+                    "nodeThresholds": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "#4f4f4f",
+                          "value": 0
+                        },
+                        {
+                          "color": "blue",
+                          "value": 1000000000
+                        }
+                      ]
+                    },
+                    "nodeValueField": "TotalVolume",
+                    "nodeWidth": 7,
+                    "outboundValueField": "OutboundVolume",
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "srcField": "Source",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": true,
+                    "mapjson": "{\"edges\":[],\"nodes\":[]}",
+                    "name": "Layer 2",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": true,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 3",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": true
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 4",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 5",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 6",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 7",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 8",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 9",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 10",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 11",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 12",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 13",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 14",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 15",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 16",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 17",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 18",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 19",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  },
+                  {
+                    "color": "grey",
+                    "dashboardEdgeDstVar": "dest",
+                    "dashboardEdgeSrcVar": "source",
+                    "dashboardNodeVar": "node",
+                    "edgeWidth": 3,
+                    "endpointId": "names",
+                    "legend": false,
+                    "mapjson": "{\"edges\":[], \"nodes\":[]}",
+                    "name": "Layer 20",
+                    "nodeWidth": 5,
+                    "pathOffset": 3,
+                    "remoteUrl": "",
+                    "visible": false
+                  }
+                ],
+                "legendColumnLength": 3,
+                "legendDefaultBehavior": "minimized",
+                "legendPosition": "bottomleft",
+                "showLegend": true,
+                "showSidebar": false,
+                "showViewControls": true,
+                "tileset": {
+                  "geographic": "arcgis"
+                },
+                "topologySource": "json",
+                "viewport": {
+                  "center": {
+                    "lat": 41.89016698029057,
+                    "lng": -62.5193439905515
+                  },
+                  "zoom": 3.375
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "#a7a7a7"
+                      },
+                      {
+                        "value": 1000000000,
+                        "color": "#ff3694"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "Top ASes Sending to SCinet",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  src_as_id AS as_id,\n  meta_as.name AS as_name,\n  SUM(bit_count)/8 AS volume\nFROM\n  data_flow_by_edge_as_5m AS flow\nLEFT JOIN meta_as ON meta_as.ref = src_as_ref\nWHERE\n  $__timeFilter(start_time)\n  AND out_interface_edge = true \n  AND dst_as_id IN (401015,14031)\nGROUP BY\n  as_id,\n  as_name\nORDER BY\n  volume DESC\nLIMIT 50"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "ESnet MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "as_id": "ASN",
+                        "as_name": "AS Name",
+                        "volume": "Volume"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true,
+                "sortBy": []
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "blue"
+                      },
+                      {
+                        "value": 80,
+                        "color": "blue"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "decbytes"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "basic",
+                          "type": "gauge",
+                          "valueDisplayMode": "text"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ASN"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 117
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "id": 3,
+          "title": "Top ASes Receiving from SCinet",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 1,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "table",
+                        "rawSql": "SELECT\n  dst_as_id AS as_id,\n  meta_as.name AS as_name,\n  SUM(bit_count)/8 AS volume\nFROM\n  data_flow_by_edge_as_5m AS flow\nLEFT JOIN meta_as ON meta_as.ref = dst_as_ref\nWHERE\n  $__timeFilter(start_time)\n  AND out_interface_edge = true \n  AND src_as_id IN (401015,14031)\nGROUP BY\n  as_id,\n  as_name\nORDER BY\n  volume DESC\nLIMIT 50"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "ESnet MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "as_id": "ASN",
+                        "as_name": "AS Name",
+                        "volume": "Volume"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "blue"
+                      },
+                      {
+                        "value": 80,
+                        "color": "blue"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "scope": "series",
+                      "options": "Volume"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "decbytes"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "basic",
+                          "type": "gauge",
+                          "valueDisplayMode": "text"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ASN"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 117
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "Traffic by Top 50 ASes Receiving from SCinet Over Time",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  concat(dst_as_id, ':', coalesce(meta_as.name, 'Unknowm')) as as_name,\n  SUM(bit_count)/8 AS volume\nFROM data_flow_by_edge_as_5m AS flow\nLEFT JOIN meta_as ON meta_as.ref = dst_as_ref\nWHERE src_as_id IN (401015,14031) AND $__timeFilter(time) AND out_interface_edge = true AND dst_as_id IN (\n  SELECT dst_as_id FROM data_flow_by_edge_as_5m WHERE src_as_id IN (401015,14031) AND $__timeFilter(start_time) GROUP BY dst_as_id ORDER BY SUM(bit_count) DESC LIMIT 50\n)\nGROUP BY time, as_name\nORDER BY time\n"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "ESnet MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "p95",
+                    "sum"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true,
+                  "sortBy": "Mean",
+                  "sortDesc": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "displayName": "${__field.labels.as_name}",
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "last"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 70,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "Traffic by Top 50 ASes Sending to SCinet Over Time",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-clickhouse-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorType": "sql",
+                        "format": 0,
+                        "meta": {
+                          "builderOptions": {
+                            "columns": [],
+                            "database": "",
+                            "limit": 1000,
+                            "mode": "list",
+                            "queryType": "table",
+                            "table": ""
+                          }
+                        },
+                        "pluginVersion": "4.23.5",
+                        "queryType": "timeseries",
+                        "rawSql": "SELECT\n  $__timeInterval(start_time) AS time,\n  concat(src_as_id, ':', coalesce(meta_as.name, 'Unknowm')) as as_name,\n  SUM(bit_count)/8 AS volume\nFROM data_flow_by_edge_as_5m AS flow\nLEFT JOIN meta_as ON meta_as.ref = src_as_ref\nWHERE dst_as_id IN (401015,14031) AND $__timeFilter(time) AND out_interface_edge = true AND src_as_id IN (\n  SELECT src_as_id FROM data_flow_by_edge_as_5m WHERE dst_as_id IN (401015,14031) AND $__timeFilter(start_time) GROUP BY src_as_id ORDER BY SUM(bit_count) DESC LIMIT 50\n)\nGROUP BY time, as_name\nORDER BY time\n"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "grafana-clickhouse-datasource-1",
+                        "grafana.app/export-datasource-name": "ESnet MetrANOVA ClickHouse"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "5m"
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "p95",
+                    "sum"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true,
+                  "sortBy": "Mean",
+                  "sortDesc": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "displayName": "${__field.labels.as_name}",
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "last"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 70,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg id=\"c\" data-name=\"Layer 2\" xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"160.9175\" viewBox=\"0 0 800 321.835\">\n  <defs>\n    <style>\n      .d {\n        fill: none;\n      }\n\n      .e {\n        fill: #fff;\n      }\n    </style>\n  </defs>\n  <g>\n    <g>\n      <g>\n        <g>\n          <path class=\"e\" d=\"M292.638,175.525c-.44.029-.9.056-1.346.084.147-5.976.166-19.501.142-25.648,6.61.139,26.424.081,33.232.091,1.407-4.968,1.437-10.611,0-15.588-6.938.008-26.507-.045-33.232.09.028-6.562-.006-18.055-.141-24.444,6.653.21,33.486.092,40.529.12,1.798-5.283,1.851-10.585.921-16.012h-59.165l-.921.92v84.816c-.586,11.041,10.209,11.991,18.636,11.266,0,.001,32.098.001,32.098.001,10.834-.055,12.179-5.885,12.47-15.943-6.391.081-37.564-.223-43.223.247Z\"/>\n          <path class=\"e\" d=\"M411.605,163.587c.726-20.754-22.801-28.08-38.547-34.366-8.628-2.798-13.899-11.453-6.447-18.283,9.17-7.336,25.642-.807,35.428,3.472,3.86-3.427,6.358-9.238,6.59-14.453-21.289-12.364-64.326-11.754-64.976,20.833-.882,20.232,22.052,26.075,36.988,32.521,28.383,15.992-2.169,36.031-32.524,14.739-3.746,3.251-7.175,9.236-7.511,14.384,22.261,15.958,70.593,16.487,70.999-18.847Z\"/>\n          <path class=\"e\" d=\"M480.831,182.009c-2.297-12.509,1.835-38.937-2.763-50.84-5.851-16.94-27.967-13.328-38.334-2.728-.898-8.73-9.992-9.089-17.076-8.574l-.921.922v70.219c5.877.866,12.65.902,18.494,0v-48.242c45.28-34.904-2.427,72.72,42.94,45.338-1.134-1.747-1.913-3.778-2.339-6.094Z\"/>\n          <path class=\"e\" d=\"M548.073,184.986c-.458-3.725-2.473-8.668-5.243-11.338-12.979,7.253-34.489,7.94-33.418-11.905h39.087c9.398-29.065-17.702-54.953-44.713-38.119-13.671,10.023-15.078,30.381-11.903,46.233,3.789,26.525,37.988,28.169,56.19,15.13ZM521.006,132.055c9.294-.374,12.076,9.011,11.62,16.723h-23.285c.609-8.557,2.515-16.581,11.665-16.723Z\"/>\n          <path class=\"e\" d=\"M598.486,188.422c.159-3.649-.16-7.675-1.381-11.089-3.029-.35-11.598,1.116-13.498-1.702-2.816-1.377-.819-39.089-1.382-42.026l17.148.292c1.106-4.403,1.159-8.99,0-13.391l-17.148.248v-20.654l-.991-.993c-19.102-1.713-17.161,5.835-17.077,21.575l-10.77-.176c-1.051,4.511-1.029,9.042,0,13.391l10.77-.216v40.746c-1.308,20.318,20.049,17.915,34.011,16.085.189-.661.295-1.356.319-2.09Z\"/>\n        </g>\n        <g>\n          <polygon class=\"e\" points=\"276.196 223.895 284.73 223.895 284.73 220.932 276.196 220.932 276.196 214.338 286.281 214.338 286.281 211.375 272.669 211.375 272.669 234.474 286.634 234.474 286.634 231.511 276.196 231.511 276.196 223.895\"/>\n          <path class=\"e\" d=\"M305.853,222.414c-.011,2.428.247,5.161.424,7.582h-.141c-1.342-3.74-7.986-14.977-9.945-18.621h-3.879v23.1h3.385c-.02-4.926.183-13.845-.494-18.621h.141c1.421,3.688,8.072,14.978,10.016,18.621h3.843v-23.1h-3.35v11.039Z\"/>\n          <polygon class=\"e\" points=\"319.712 223.895 328.246 223.895 328.246 220.932 319.712 220.932 319.712 214.338 329.798 214.338 329.798 211.375 316.186 211.375 316.186 234.474 330.151 234.474 330.151 231.511 319.712 231.511 319.712 223.895\"/>\n          <path class=\"e\" d=\"M347.606,224.319c5.296-1.776,5.552-10.779,0-12.326-2.526-1.009-8.982-.503-11.778-.618v23.1h3.526v-9.381h3.851l5.282,9.381h3.95l-5.714-9.9c.292-.089.607-.142.882-.256ZM339.355,214.197c3.294.107,8.966-.857,8.816,3.843.176,4.779-5.381,4.225-8.816,4.196v-8.04Z\"/>\n          <path class=\"e\" d=\"M366.05,225.13h4.619v5.5c-15.787,8.198-13.472-25.535.952-14.598l1.904-2.187c-22.846-15.151-23.319,33.318.318,18.338v-9.946h-7.793v2.893Z\"/>\n          <path class=\"e\" d=\"M387.879,217.582c-.659,1.765-1.446,3.302-2.187,5.042h-.141c-1.371-3.084-3.466-8.129-4.901-11.249h-3.738l6.912,14.318v8.782h3.526v-8.782l6.947-14.318h-3.667l-2.751,6.208Z\"/>\n          <path class=\"e\" d=\"M418.488,223.347c-1.27-1.024-4.108-2.036-5.642-2.733-9.086-3.374.384-9.922,5.29-4.549l1.869-2.292c-5.816-7.22-20.502.754-12.008,8.289,1.313,1.036,3.943,1.988,5.448,2.678,10.011,4.401-2.364,10.602-7.053,4.444l-1.94,2.292c5.957,7.857,22.537.785,14.035-8.129Z\"/>\n          <path class=\"e\" d=\"M438.042,231.194c-14.708,5.378-11.172-25.426,1.675-15.199l1.904-2.151c-22.69-15.168-21.841,34.343.458,17.738l-1.799-2.08c-.682.728-1.428,1.293-2.239,1.693Z\"/>\n          <rect class=\"e\" x=\"447.053\" y=\"211.375\" width=\"3.526\" height=\"23.1\"/>\n          <polygon class=\"e\" points=\"461.088 223.895 469.622 223.895 469.622 220.932 461.088 220.932 461.088 214.338 471.173 214.338 471.173 211.375 457.561 211.375 457.561 234.474 471.526 234.474 471.526 231.511 461.088 231.511 461.088 223.895\"/>\n          <path class=\"e\" d=\"M490.745,222.414c-.011,2.428.247,5.161.424,7.582h-.141c-1.342-3.74-7.986-14.977-9.945-18.621h-3.879v23.1h3.385c-.02-4.926.183-13.845-.494-18.621h.141c1.421,3.688,8.072,14.978,10.016,18.621h3.843v-23.1h-3.35v11.039Z\"/>\n          <path class=\"e\" d=\"M513.156,231.194c-14.708,5.378-11.172-25.426,1.675-15.199l1.904-2.151c-22.69-15.168-21.841,34.343.458,17.738l-1.799-2.08c-.682.728-1.428,1.293-2.239,1.693Z\"/>\n          <polygon class=\"e\" points=\"525.694 223.895 534.227 223.895 534.227 220.932 525.694 220.932 525.694 214.338 535.779 214.338 535.779 211.375 522.167 211.375 522.167 234.474 536.132 234.474 536.132 231.511 525.694 231.511 525.694 223.895\"/>\n          <path class=\"e\" d=\"M554.222,223.347c-1.27-1.024-4.108-2.036-5.642-2.733-9.086-3.374.384-9.922,5.29-4.549l1.869-2.292c-5.816-7.22-20.502.754-12.008,8.289,1.313,1.036,3.943,1.988,5.448,2.678,10.011,4.401-2.364,10.602-7.053,4.444l-1.94,2.292c5.957,7.857,22.537.785,14.035-8.129Z\"/>\n          <path class=\"e\" d=\"M583.174,222.414c-.011,2.428.247,5.161.424,7.582h-.141c-1.342-3.74-7.986-14.977-9.945-18.621h-3.879v23.1h3.385c-.02-4.926.183-13.845-.494-18.621h.141c1.421,3.688,8.072,14.978,10.016,18.621h3.843v-23.1h-3.35v11.039Z\"/>\n          <polygon class=\"e\" points=\"597.033 223.895 605.567 223.895 605.567 220.932 597.033 220.932 597.033 214.338 607.118 214.338 607.118 211.375 593.506 211.375 593.506 234.474 607.471 234.474 607.471 231.511 597.033 231.511 597.033 223.895\"/>\n          <polygon class=\"e\" points=\"611.068 214.373 617.909 214.373 617.909 234.474 621.436 234.474 621.436 214.373 628.242 214.373 628.242 211.375 611.068 211.375 611.068 214.373\"/>\n          <path class=\"e\" d=\"M651.517,223.471c-.384,2.573-.777,4.953-1.093,7.582h-.141c-.856-4.992-3.218-14.646-4.373-19.678h-3.526c-1.191,5.074-3.625,14.626-4.373,19.678h-.141c-.551-4.983-2.426-14.642-3.315-19.678h-3.774l4.62,23.1h4.62c.863-4.018,3.625-14.549,3.985-18.514h.141c.424,3.895,3.055,14.566,3.915,18.514h4.619l4.655-23.1h-3.597l-2.221,12.096Z\"/>\n          <path class=\"e\" d=\"M675.78,212.363c-13.153-7.571-20.998,14.028-10.438,21.071,13.026,7.729,21.069-14.209,10.438-21.071ZM676.15,227.58c-7.256,12.93-17.382-6.109-8.975-12.484,7.698-4.788,11.769,6.584,8.975,12.484Z\"/>\n          <path class=\"e\" d=\"M698.031,224.319c5.296-1.776,5.552-10.779,0-12.326-2.526-1.009-8.982-.503-11.778-.618v23.1h3.526v-9.381h3.851l5.282,9.381h3.95l-5.714-9.9c.292-.089.607-.142.882-.256ZM689.78,214.197c3.294.107,8.966-.857,8.816,3.843.176,4.779-5.381,4.225-8.816,4.196v-8.04Z\"/>\n          <polygon class=\"e\" points=\"716.933 220.298 724.127 211.375 720.177 211.375 711.255 222.414 711.15 222.414 711.15 211.375 707.623 211.375 707.623 234.474 711.15 234.474 711.15 227.456 714.816 223.048 721.376 234.474 725.291 234.474 716.933 220.298\"/>\n        </g>\n      </g>\n      <g>\n        <path class=\"e\" d=\"M196.814,119.872c17.252-.389,32.537,2.356,43.914,5.359-16.636-38.066-64.083-60.35-105.165-46.932,17.059,5.378,41.88,20.589,61.251,41.574Z\"/>\n        <path class=\"e\" d=\"M211.283,138.021c13.812,20.777,18.006,40.518,18.131,56.603,5.993-.598,10.773-1.45,14.102-2.16,6.152-16.263,7.074-36.145,2.363-53.076-8.804-1.439-20.716-2.539-34.596-1.366Z\"/>\n        <path class=\"e\" d=\"M225.75,221.528c5.527-6.012,10.215-12.801,13.904-20.179-2.802,1.052-6.197,2.225-10.697,3.394-.645,6.604-1.899,12.238-3.207,16.785Z\"/>\n        <path class=\"e\" d=\"M187.933,142.067c-17.947,4.357-39.996,16.272-54.634,29.677,24.722,16.771,61.379,24.59,82.456,23.598-3.056-16.185-11.464-36.042-27.822-53.274Z\"/>\n        <path class=\"e\" d=\"M139.644,198.974c-8.277-3.007-15.801-6.477-22.628-10.229-10.165,12.59-16.279,24.653-19.821,33.323,29.895,33.324,85.303,37.217,119.596,7.94.784-5.704,1.361-13.539.601-22.835-18.86,3.083-45.873,3.384-77.748-8.199Z\"/>\n        <path class=\"e\" d=\"M73.993,153.255c-1.389,13.208.443,27.216,4.933,39.237,3.15-5.714,7.577-12.766,13.731-20.372-7.632-6.401-13.738-12.87-18.664-18.865Z\"/>\n        <path class=\"e\" d=\"M110.388,153.782c13.77-12.294,36.187-25.075,56.196-29.834-25.166-16.932-52.032-22.2-67.296-23.85-5.936,5.926-11.022,12.699-15.072,20.12,5.295,9.349,13.65,21.571,26.172,33.564Z\"/>\n      </g>\n    </g>\n    <rect class=\"d\" x=\".088\" y=\".071\" width=\"799.824\" height=\"321.764\"/>\n  </g>\n  <rect class=\"d\" x=\".088\" y=\".071\" width=\"799.824\" height=\"321.764\"/>\n</svg>\n<div>\n    <svg preserveAspectRatio=\"xMidYMid meet\" data-bbox=\"0.608 2.258 601.347 90.277\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 603 95\" height=\"50\" width=\"400\" data-type=\"ugc\" role=\"img\" aria-label=\"layer1\">\n    <g>\n        <path stroke=\"#ffffff\" fill=\"#ffffff\" d=\"m24.578 7.945.112.347 16.353 50.919L57.035 8.295l.11-.35h8.051l.081.4 15.88 77.854.121.6H66.87l-.077-.405-7.732-40.181L44.016 87.48l-.12.329h-5.64l-.12-.33L23.08 46.19l-8.04 40.207-.082.403H.608l.12-.599L16.396 8.347l.08-.402zm88.324 19.862c8.356 0 15.111 2.496 20.213 7.526 5.096 5.024 7.637 11.422 7.637 19.155 0 1.688-.382 4.194-1.127 7.493l-.088.39H99.046c.33 4.167 1.83 7.38 4.468 9.691 2.754 2.414 6.484 3.647 11.247 3.647 5.97 0 10.426-1.553 13.454-4.58l.487-.487.313.614 5.151 10.143.183.36-.314.256c-4.799 3.89-11.907 5.794-21.239 5.794-8.777 0-15.783-2.566-20.96-7.742l-.001-.002c-5.143-5.215-7.686-12.454-7.686-21.647 0-9.069 2.8-16.46 8.43-22.126l.001-.001c5.65-5.65 12.434-8.484 20.322-8.484Zm53.766 1.062h15.613v11.674h-15.613V64.95c0 4.045.639 6.789 1.81 8.353l.223.271c1.174 1.314 3.151 2.029 6.07 2.029q4.633.001 8.657-2.526l.765-.481V86.07l-.337.117c-3.157 1.088-7.612 1.62-13.333 1.62-5.76 0-10.261-1.623-13.425-4.934l-.002-.002c-3.159-3.342-4.704-8.048-4.704-14.045V40.543h-6.585V28.869h6.585V17.443l.327-.12 13.276-4.886.673-.247zM317.022 7.945l.151.192 35.856 45.804V7.945h14.277V87.81h-6.376l-.151-.197-36.862-48.061V86.8h-14.276V7.945zm171.862 0 .115.338 17.543 51.233 18.529-51.242.119-.329h15.95l-.262.68-30.377 78.863-.123.32h-8.286l-.121-.327-29.103-78.863-.248-.673zM222.09 27.807c4.569 0 8.14.694 10.657 2.137l.408.235-.209.42-5.629 11.366-.251.506-.471-.31c-2.291-1.504-4.798-2.255-7.533-2.255-2.905 0-5.519 1.311-7.852 4.022-2.286 2.697-3.438 5.995-3.438 9.924v32.894h-14.276V28.87h14.276v4.452c3.712-3.68 8.498-5.514 14.318-5.514Zm48.879-20.924.125.315 31.28 78.864.272.684h-16.33l-.119-.33-5.563-15.442h-25.951l-5.301 15.435-.116.337h-16.439l.269-.682L264.109 7.2l.125-.317zm299.309 0 .125.315 31.281 78.864.271.684h-16.329l-.119-.33-5.564-15.442h-25.952l-5.3 15.435-.116.337h-16.438l.268-.682L563.419 7.2l.125-.317zm-12.025 52.522h17.317l-8.659-26.616zm-299.31 0h17.318l-8.659-26.616zM113.114 39.906c-3.692 0-6.638 1.012-8.883 2.995-2.138 1.89-3.686 4.701-4.612 8.486h26.736c-.509-3.799-1.828-6.607-3.911-8.49-2.182-1.972-5.269-2.99-9.33-2.99Z\"></path>\n        <path stroke-width=\"10\" stroke=\"#9FC9D2\" fill=\"#F2C641\" d=\"M424.085 5c23.385 0 42.342 18.958 42.342 42.343s-18.957 42.341-42.342 42.342-42.343-18.957-42.343-42.342S400.7 5 424.085 5Z\"></path>\n        <path fill=\"#45A9BF\" d=\"M424.132 10.219a37.2 37.2 0 0 0-16.466 3.919 46.7 46.7 0 0 1 12.888 15.844c7.937-5.868 17.733-9.26 28.143-9.17.486.004.975.03 1.463.05a37.17 37.17 0 0 0-26.028-10.643m-21.45 6.913a37 37 0 0 0-2.84 2.127l-.118.105a37 37 0 0 0-3.634 3.634l-.081.09a37 37 0 0 0-3.094 4.134l-.1.156a37 37 0 0 0-2.483 4.547l-.029.065a37 37 0 0 0-1.805 4.84l-.049.16a39 39 0 0 0-.273 1.258 46.76 46.76 0 0 1 22.504-3.143h.008c1.192.132 2.367.317 3.529.536a47 47 0 0 1 2.108-2.123 41.6 41.6 0 0 0-13.643-16.386m45.964 8.99c-9.686-.09-18.75 3.206-25.946 8.867.159.442.303.89.446 1.338h.072c15.634.005 29.598 9.142 36.057 22.944q.258-.654.491-1.317l.049-.16c.48-1.647.845-3.325 1.093-5.023l.026-.192a37 37 0 0 0 .37-5.175l.001-.011q0-.948-.05-1.895a23 23 0 0 0-.039-.53c-.029-.45-.06-.902-.106-1.351a41 41 0 0 0-.086-.695c-.048-.393-.095-.787-.155-1.18a40 40 0 0 0-.133-.762c-.064-.365-.127-.73-.202-1.093a41 41 0 0 0-.175-.778 35 35 0 0 0-.256-1.066 36 36 0 0 0-.217-.786 40 40 0 0 0-.304-1.027 37 37 0 0 0-.261-.787 36 36 0 0 0-1.399-3.525q-.22-.48-.454-.95a36 36 0 0 0-.381-.758 38 38 0 0 0-.489-.9q-.21-.384-.431-.762a34 34 0 0 0-.533-.87 35 35 0 0 0-.456-.72q-.089-.127-.176-.256c-.704-.118-1.406-.245-2.114-.326h-.01a42 42 0 0 0-4.231-.252zM405.41 40.149q-.781.006-1.563.04c-5.789.258-11.449 1.803-16.664 4.41l-.088.898a38 38 0 0 0-.118 1.64c-.003.093-.014.185-.016.278.041 3.26.51 6.5 1.397 9.638a39.87 39.87 0 0 1 17.895-16.886c-.281-.003-.562-.02-.843-.018\"></path>\n        <path fill=\"#DA8F53\" d=\"M423.607 41.64c-14.447.035-27.237 9.068-32.232 22.553l.052.124a37 37 0 0 0 3.02 4.928 37.2 37.2 0 0 0 8.224 8.224 37.2 37.2 0 0 0 10.363 5.28 37.18 37.18 0 0 0 22.973 0 37.2 37.2 0 0 0 14.799-9.068 37 37 0 0 0 3.777-4.423c.717-1.017 1.337-2.096 1.948-3.178-4.428-14.467-17.71-24.433-32.924-24.44\"></path>\n        <path fill=\"#ffffff\" d=\"M424.085 60.91c8.257 0 14.951-6.394 14.951-14.283s-6.694-14.283-14.951-14.283-14.952 6.395-14.952 14.283c0 7.889 6.694 14.284 14.952 14.284\"></path>\n        <path fill-opacity=\".8\" fill=\"#9FC9D2\" d=\"M424.085 60.91c8.257 0 14.951-6.394 14.951-14.283s-6.694-14.283-14.951-14.283-14.952 6.395-14.952 14.283c0 7.889 6.694 14.284 14.952 14.284\"></path>\n        <path fill=\"#345F68\" d=\"M424.134 29.867A17.53 17.53 0 0 0 411.742 35a17.54 17.54 0 0 0-5.133 12.392 17.54 17.54 0 0 0 5.133 12.391 17.52 17.52 0 0 0 24.783 0 17.52 17.52 0 0 0 3.799-19.098 17.52 17.52 0 0 0-9.484-9.484 17.5 17.5 0 0 0-6.706-1.334m0 4.248a13.27 13.27 0 0 1 12.265 8.196 13.28 13.28 0 0 1 0 10.161 13.27 13.27 0 0 1-7.185 7.185 13.27 13.27 0 0 1-14.468-2.878 13.27 13.27 0 0 1-2.878-14.468 13.27 13.27 0 0 1 7.185-7.185 13.3 13.3 0 0 1 5.081-1.01\"></path>\n        <path fill=\"#214148\" d=\"M424.138 2.258a45.14 45.14 0 0 0-31.746 13.212l-1.22 1.22A45.14 45.14 0 0 0 379 47.396c0 24.93 20.209 45.139 45.138 45.139 24.93 0 45.139-20.21 45.139-45.139S449.068 2.258 424.138 2.258m0 5.31c21.997 0 39.828 17.832 39.828 39.828s-17.831 39.828-39.828 39.828c-21.996 0-39.828-17.832-39.828-39.828.038-9.916 3.243-18.931 9.946-26.24l15.432 16.075a26.4 26.4 0 0 0-4.33 14.526c0 14.664 11.888 26.552 26.552 26.552s26.552-11.888 26.552-26.552-11.888-26.552-26.552-26.552c-7.355 0-14.01 2.991-18.818 7.822l-16.2-14.654c7.427-7.255 16.864-10.791 27.246-10.805m7.772 25.603c4.311.004 7.956.977 11.28 3.722l-15.368 5.114-1.906 2.713a3.21 3.21 0 0 0-2.653-.413l-.044-.068-1.049-3-3.159-2.857a18.52 18.52 0 0 1 12.899-5.211m13.908 6.31c3.319 3.44 4.654 7.496 4.678 12.276 0 10.265-8.321 18.586-18.586 18.586s-18.587-8.32-18.587-18.586c0-3.089.758-6 2.092-8.562l2.428 2.53 3.016.922.14.104a3.3 3.3 0 0 0-.074.645 3.22 3.22 0 0 0 .941 2.272 3.22 3.22 0 0 0 2.272.94 3.215 3.215 0 0 0 3.198-3.006l.529-.15 2.998-.005 14.469-7.68z\"></path>\n    </g>\n</svg>\n</div>\n\n\n<style>\n  .leaflet-layer,\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out,\n.leaflet-control-attribution {\n  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);\n}\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "text",
+            "version": "13.0.12",
+            "spec": {
+              "options": {
+                "code": {
+                  "language": "plaintext",
+                  "showLineNumbers": false,
+                  "showMiniMap": false
+                },
+                "content": "<center>\n<h1>What SCinet Traffic is going over ESnet?</h1>\n</center>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');\n  h1 {\n    font-family: \"Barlow Semi Condensed\", sans-serif;\n    font-size: 30pt;\n    font-weight: 500;\n    color: #FF3694;\n  }\n\n    body {\n  background: rgb(17, 18, 23) !important;\n  }\n</style>",
+                "mode": "html"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              }
+            }
+          },
+          "transparent": true
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 2,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-7"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 2,
+              "width": 9,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 9,
+              "y": 2,
+              "width": 15,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 12,
+              "width": 11,
+              "height": 9,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 12,
+              "width": 11,
+              "height": 9,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 1,
+              "y": 21,
+              "width": 11,
+              "height": 8,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 21,
+              "width": 11,
+              "height": 8,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "show floor"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-6h",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "ESnet - SC26",
+    "variables": [],
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    }
+  }
+}
